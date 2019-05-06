@@ -19,4 +19,8 @@ export default function bootstrap() {
   auth.on('profile', profile => {
     store.dispatch(updateUser(profile))
   })
+
+  auth.on('changePassword', formData => {
+    console.log(formData)
+  })
 }

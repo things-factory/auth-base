@@ -27,6 +27,7 @@ class ClientAuth {
     profilePath = 'authcheck',
     signinPage = 'signin',
     signupPage = 'signup',
+    changepassPath = 'users/change_pass',
     signoutPage,
     endpoint = ''
   }) {
@@ -51,6 +52,7 @@ class ClientAuth {
     this.signinPage = signinPage
     this.signupPage = signupPage
     this.signoutPage = signoutPage
+    this.changepassPath = changepassPath
   }
 
   on(event, handler) {
@@ -105,11 +107,13 @@ class ClientAuth {
   }
 
   set authProvider(provider) {
+    //connect base with provider
     if (provider) {
       this.signup = provider.signup.bind(this)
       this.signin = provider.signin.bind(this)
       this.signout = provider.signout.bind(this)
       this.profile = provider.profile.bind(this)
+      this.changePassword = provider.changePassword.bind(this)
     } else {
       this.signup = this.signin = this.signout = this.profile = NOOP
     }
@@ -174,6 +178,11 @@ class ClientAuth {
 
   onAuthError(error) {
     /* signin, signup 과정에서 에러가 발생한 경우 */
+    this._event_listeners.error.forEach(handler => handler(error))
+  }
+
+  onChangePwdError(error) {
+    //listen from server error
     this._event_listeners.error.forEach(handler => handler(error))
   }
 
