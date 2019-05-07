@@ -35,6 +35,7 @@ class ClientAuth {
       signin: [],
       signout: [],
       profile: [],
+      changePassword: [],
       error: []
     }
 
@@ -179,6 +180,11 @@ class ClientAuth {
   onAuthError(error) {
     /* signin, signup 과정에서 에러가 발생한 경우 */
     this._event_listeners.error.forEach(handler => handler(error))
+  }
+
+  onPwdChanged(result) {
+    //event is changePassword, handler is result
+    this._event_listeners.changePassword.forEach(handler => handler(result))
   }
 
   onChangePwdError(error) {
