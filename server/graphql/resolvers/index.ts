@@ -5,6 +5,20 @@ import * as UsersRole from './users-role'
 import * as PermitUrl from './permit-url'
 import * as Role from './role'
 
-export const queries = [User.Query]
+export const queries = [
+  User.Query,
+  UserHistory.Query,
+  UserRoleHistory.Query,
+  UsersRole.Query,
+  PermitUrl.Query,
+  Role.Query
+]
 
-export const mutations = [User.Mutation]
+export const mutations = [
+  User.Mutation,
+  UserHistory.Mutation,
+  UserRoleHistory.Mutation,
+  UsersRole.Mutation,
+  PermitUrl.Mutation,
+  Role.Mutation
+]
