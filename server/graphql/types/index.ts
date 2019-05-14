@@ -1,18 +1,13 @@
 import * as User from './user'
 
-const Query = ['type Query {', User.Query, '}'].join('\n')
+export const queries = [
+  User.Query
+]
 
-const Mutation = ['type Mutation {', User.Mutation, '}'].join('\n')
+export const mutations = [
+  User.Mutation
+]
 
-export const typeDefs = [
-  `
-    schema {
-      query: Query
-      mutation: Mutation
-    }
-  `,
-  Query,
-  Mutation,
-
+export const types = [
   ...User.Types
 ]

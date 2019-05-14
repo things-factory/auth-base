@@ -1,11 +1,9 @@
 import * as User from './user'
 
-export const resolvers = {
-  Query: {
-    ...User.Query
-  },
-
-  Mutation: {
-    ...User.Mutation
-  }
-}
+export const queries = [
+  User.Query
+]
+ 
+export const mutations = [
+  User.Mutation
+]
