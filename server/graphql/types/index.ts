@@ -1,18 +1,33 @@
 import * as User from './user'
+import * as UserHistory from './user-history'
+import * as UserRoleHistory from './user-role-history'
+import * as UsersRole from './users-role'
+import * as PermitUrl from './permit-url'
+import * as Role from './role'
 
-const Query = ['type Query {', User.Query, '}'].join('\n')
+export const queries = [
+  User.Query,
+  UserHistory.Query,
+  UserRoleHistory.Query,
+  UsersRole.Query,
+  PermitUrl.Query,
+  Role.Query
+]
 
-const Mutation = ['type Mutation {', User.Mutation, '}'].join('\n')
+export const mutations = [
+  User.Mutation,
+  UserHistory.Mutation,
+  UserRoleHistory.Mutation,
+  UsersRole.Mutation,
+  PermitUrl.Mutation,
+  Role.Mutation
+]
 
-export const typeDefs = [
-  `
-    schema {
-      query: Query
-      mutation: Mutation
-    }
-  `,
-  Query,
-  Mutation,
-
-  ...User.Types
+export const types = [
+  ...User.Types,
+  ...UserHistory.Types,
+  ...UserRoleHistory.Types,
+  ...UsersRole.Types,
+  ...PermitUrl.Types,
+  ...Role.Types
 ]
