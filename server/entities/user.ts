@@ -5,7 +5,7 @@ import { BaseEntity } from '@things-factory/shell'
 
 const SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
 
-@Entity('user')
+@Entity('users')
 @Index('ix_user_0', (user: User) => [user.email], { unique: true })
 export class User extends BaseEntity {
   @PrimaryColumn('text')
