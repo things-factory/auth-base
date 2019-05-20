@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-base",
-  "version": "0.0.15",
+  "version": "0.1.0",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "@things-factory/auth-provider-jwt": "*",
-    "@things-factory/auth-ui-jwt": "*",
-    "@things-factory/layout-ui": "*"
+    "@things-factory/auth-ui-jwt": "*"
   }
 }

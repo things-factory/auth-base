@@ -23,6 +23,13 @@ export default function bootstrap() {
   auth.on('changePassword', result => {
     //question mark boolean (true or false)
     let message = result ? 'Password Change Successfully' : 'Failed to Change Password'
-    document.dispatchEvent(new CustomEvent('notify', { detail: message }))
+    document.dispatchEvent(
+      new CustomEvent('notify', {
+        detail: {
+          type: result ? 'info' : 'error',
+          message
+        }
+      })
+    )
   })
 }
