@@ -27,7 +27,7 @@ class ClientAuth {
     profilePath = 'authcheck',
     signinPage = 'signin',
     signupPage = 'signup',
-    changepassPath = 'users/change_pass',
+    changepassPath = 'change_pass',
     signoutPage,
     endpoint = ''
   }) {

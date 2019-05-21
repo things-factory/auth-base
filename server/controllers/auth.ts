@@ -29,7 +29,7 @@ export async function signin(attrs) {
   const user = await repository.findOne({ email: attrs.email })
 
   if (!user) {
-    throw new Error('user notfound.')
+    throw new Error('user not found.')
   }
 
   if (!user.verify(attrs.password)) {
@@ -45,8 +45,23 @@ export async function authcheck(email) {
   const user = await repository.findOne({ email })
 
   if (!user) {
-    throw new Error('user notfound.')
+    throw new Error('user not found.')
   }
+
+  return await user.sign()
+}
+
+export async function changePwd(attrs, newPass) {
+  const repository = getRepository(User)
+
+  const user = await repository.findOne({ email: attrs.email })
+
+  if (!user) {
+    throw new Error('user not found.')
+  }
+
+  user.password = User.encode(newPass)
+  await repository.save(user)
 
   return await user.sign()
 }

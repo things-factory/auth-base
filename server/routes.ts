@@ -1,7 +1,7 @@
 import Router from 'koa-router'
 import koaBodyParser from 'koa-bodyparser'
 
-import { signup, signin, authcheck } from './controllers/auth'
+import { signup, signin, authcheck, changePwd } from './controllers/auth'
 
 // import { authMiddleware } from './middlewares/auth-middleware'
 const MAX_AGE = 7 * 24 * 3600 * 1000
@@ -81,5 +81,24 @@ routes.get('/authcheck', async (context, next) => {
     context.body = {
       message: e.message
     }
+  }
+})
+
+routes.post('/change_pass', koaBodyParser(bodyParserOption), async (context, next) => {
+  try {
+    let newPassword = context.request.body.new_pass
+    const token = await changePwd(context.state.user, newPassword)
+
+    context.body = {
+      message: 'Password Changed Successfully',
+      token
+    }
+
+    context.cookies.set('access_token', token, {
+      httpOnly: false,
+      maxAge: MAX_AGE
+    })
+  } catch (e) {
+    throw new Error(e)
   }
 })

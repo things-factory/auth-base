@@ -27,6 +27,10 @@
   },
   "devDependencies": {
     "@things-factory/auth-provider-jwt": "*",
-    "@things-factory/auth-ui-jwt": "*"
+    "@things-factory/auth-ui-jwt": "*",
+    "@things-factory/layout-ui": "*",
+    "@things-factory/menu-ui": "*",
+    "@things-factory/resource-ui": "*",
+    "@things-factory/setting-ui": "*"
   }
 }
