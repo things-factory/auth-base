@@ -3,6 +3,7 @@ import { UserHistory } from './user-history'
 import { Role } from './role'
 import { PermitUrl } from './permit-url'
 import { Priviledge } from './priviledge'
+import { Appliance } from './appliance'
 
-export const entities = [User, UserHistory, Role, PermitUrl, Priviledge]
-export { User, UserHistory, Role, PermitUrl, Priviledge }
+export const entities = [User, UserHistory, Role, PermitUrl, Priviledge, Appliance]
+export { User, UserHistory, Role, PermitUrl, Priviledge, Appliance }
