@@ -1,10 +1,13 @@
+import { buildQuery, ListParam } from '@things-factory/shell'
 import { getRepository } from 'typeorm'
 import { User } from '../../../entities'
 
 export const usersResolver = {
-  async users() {
-    const repository = getRepository(User)
+  async users(_: any, params: ListParam, context: any) {
+    const queryBuilder = getRepository(User).createQueryBuilder()
+    buildQuery(queryBuilder, params)
+    const [items, total] = await queryBuilder.getManyAndCount()
 
-    return await repository.find()
+    return { items, total }
   }
 }

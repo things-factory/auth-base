@@ -1,5 +1,7 @@
-import { User } from './user'
+import { Filter, Pagination, Sorting } from '@things-factory/shell'
 import { NewUser } from './new-user'
+import { User } from './user'
+import { UserList } from './user-list'
 import { UserPatch } from './user-patch'
 
 export const Mutation = `
@@ -18,8 +20,8 @@ export const Mutation = `
 `
 
 export const Query = `
-  users: [User]
+  users(filters: [Filter], pagination: Pagination, sortings: [Sorting]): UserList
   user(email: String!): User
 `
 
-export const Types = [User, NewUser, UserPatch]
+export const Types = [Filter, Pagination, Sorting, User, NewUser, UserPatch, UserList]

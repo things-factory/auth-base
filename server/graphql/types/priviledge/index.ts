@@ -1,8 +1,8 @@
-import { Priviledge } from './priviledge'
-import { NewPriviledge } from './new-priviledge'
-import { PriviledgePatch } from './priviledge-patch'
-import { PriviledgeList } from './priviledge-list'
 import { Filter, Pagination, Sorting } from '@things-factory/shell'
+import { NewPriviledge } from './new-priviledge'
+import { Priviledge } from './priviledge'
+import { PriviledgeList } from './priviledge-list'
+import { PriviledgePatch } from './priviledge-patch'
 
 export const Mutation = `
   createPriviledge (

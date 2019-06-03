@@ -1,5 +1,7 @@
-import { Role } from './role'
+import { Filter, Pagination, Sorting } from '@things-factory/shell'
 import { NewRole } from './new-role'
+import { Role } from './role'
+import { RoleList } from './role-list'
 import { RolePatch } from './role-patch'
 
 export const Mutation = `
@@ -18,8 +20,8 @@ export const Mutation = `
 `
 
 export const Query = `
-  roles: [Role]
+  roles(filters: [Filter], pagination: Pagination, sortings: [Sorting]): RoleList
   role(name: String!): Role
 `
 
-export const Types = [Role, NewRole, RolePatch]
+export const Types = [Filter, Pagination, Sorting, Role, NewRole, RolePatch, RoleList]
