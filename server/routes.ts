@@ -1,10 +1,13 @@
-import Router from 'koa-router'
 import koaBodyParser from 'koa-bodyparser'
 
 import { signup, signin, authcheck, changePwd } from './controllers/auth'
 
 // import { authMiddleware } from './middlewares/auth-middleware'
 const MAX_AGE = 7 * 24 * 3600 * 1000
+
+process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
+  fallbackOption.whiteList.push('/authcheck')
+})
 
 process.on('bootstrap-module-route' as any, (app, routes) => {
   const bodyParserOption = {
