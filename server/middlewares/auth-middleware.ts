@@ -1,6 +1,8 @@
 import { User } from '../entities'
+import unless from 'koa-unless'
+;(authMiddleware as any).unless = unless
 
-export function getToken(context) {
+function getToken(context) {
   const req = context.request
 
   var token =
