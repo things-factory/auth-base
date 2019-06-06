@@ -2,7 +2,6 @@ import koaBodyParser from 'koa-bodyparser'
 
 import { signup, signin, authcheck, changePwd } from './controllers/auth'
 
-// import { authMiddleware } from './middlewares/auth-middleware'
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
@@ -15,8 +14,6 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     jsonLimit: '10mb',
     textLimit: '10mb'
   }
-
-  // routes.use('/', authMiddleware)
 
   // for authentication
   routes.post('/signup', koaBodyParser(bodyParserOption), async (context, next) => {
@@ -104,6 +101,4 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       throw new Error(e)
     }
   })
-
-  console.log('auth-base routing ...')
 })
