@@ -5,6 +5,9 @@ export const permitUrlResolver = {
   async permitUrl(_, { name }, context, info) {
     const repository = getRepository(PermitUrl)
 
-    return await repository.findOne({ name })
+    return await repository.findOne({
+      where: { name },
+      relations: ['domain', 'creator', 'updater']
+    })
   }
 }

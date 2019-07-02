@@ -1,5 +1,6 @@
-import { DomainBaseEntity, Domain } from '@things-factory/shell'
-import { Column, Entity, Index, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
+import { Domain, DomainBaseEntity } from '@things-factory/shell'
+import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { User } from './user'
 
 @Entity('permit-urls')
 @Index('ix_permit_url_0', (permitUrl: PermitUrl) => [permitUrl.domain, permitUrl.name], { unique: true })
@@ -26,4 +27,10 @@ export class PermitUrl extends DomainBaseEntity {
     default: false
   })
   active: boolean
+
+  @ManyToOne(type => User)
+  creator: User
+
+  @ManyToOne(type => User)
+  updater: User
 }

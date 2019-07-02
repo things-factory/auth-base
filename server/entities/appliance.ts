@@ -1,5 +1,6 @@
-import { Entity, Index, Column, ManyToOne } from 'typeorm'
 import { Domain, DomainBaseEntity } from '@things-factory/shell'
+import { Column, Entity, Index, ManyToOne } from 'typeorm'
+import { User } from './user'
 
 @Entity('appliances')
 @Index('ix_appliance_0', (appliance: Appliance) => [appliance.domain, appliance.name, appliance.applianceId], {
@@ -28,4 +29,10 @@ export class Appliance extends DomainBaseEntity {
     nullable: true
   })
   description: string
+
+  @ManyToOne(type => User)
+  creator: User
+
+  @ManyToOne(type => User)
+  updater: User
 }

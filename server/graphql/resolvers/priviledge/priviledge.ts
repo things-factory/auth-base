@@ -5,8 +5,9 @@ export const priviledgeResolver = {
   async priviledge(_, { id }, context, info) {
     const repository = getRepository(Priviledge)
 
-    return await repository.findOne(
-      { id }
-    )
+    return await repository.findOne({
+      where: { domain: context.domain, id },
+      relations: ['domain', 'creator', 'updater']
+    })
   }
 }

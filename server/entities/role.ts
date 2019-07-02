@@ -1,7 +1,7 @@
 import { Domain, DomainBaseEntity } from '@things-factory/shell'
-import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm'
-import { User } from './user'
+import { Column, Entity, Index, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { Priviledge } from './priviledge'
+import { User } from './user'
 
 @Entity('roles')
 @Index('ix_role_0', (role: Role) => [role.domain, role.name], { unique: true })
@@ -25,4 +25,10 @@ export class Role extends DomainBaseEntity {
     nullable: true
   })
   description: string
+
+  @ManyToOne(type => User)
+  creator: User
+
+  @ManyToOne(type => User)
+  updater: User
 }

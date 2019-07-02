@@ -6,5 +6,7 @@ export const Priviledge = gql`
     name: String
     domain: Domain
     description: String
+    creator: User
+    updater: User
   }
 `

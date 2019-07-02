@@ -5,6 +5,9 @@ export const roleResolver = {
   async role(_, { name }, context, info) {
     const repository = getRepository(Role)
 
-    return await repository.findOne({ name })
+    return await repository.findOne({
+      where: { domain: context.domain, name },
+      relations: ['domain', 'creator', 'updater']
+    })
   }
 }

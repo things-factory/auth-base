@@ -6,5 +6,7 @@ export const PermitUrl = gql`
     description: String
     createdAt: String
     updatedAt: String
+    creator: User
+    updater: User
   }
 `

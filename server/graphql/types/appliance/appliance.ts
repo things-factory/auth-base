@@ -6,5 +6,7 @@ export const Appliance = gql`
     name: String
     domain: Domain
     description: String
+    creator: User
+    updater: User
   }
 `

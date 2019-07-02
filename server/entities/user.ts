@@ -1,3 +1,4 @@
+import { BaseEntity } from '@things-factory/shell'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import {
@@ -6,12 +7,10 @@ import {
   Entity,
   getRepository,
   Index,
-  PrimaryColumn,
-  UpdateDateColumn,
+  JoinTable,
   ManyToMany,
-  JoinTable
+  UpdateDateColumn
 } from 'typeorm'
-import { BaseEntity } from '@things-factory/shell'
 import { Role } from './role'
 
 const SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
@@ -19,7 +18,7 @@ const SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
 @Entity('users')
 @Index('ix_user_0', (user: User) => [user.email], { unique: true })
 export class User extends BaseEntity {
-  @PrimaryColumn('text')
+  @Column('text')
   email: string
 
   @Column('text', {

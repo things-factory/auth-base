@@ -21,7 +21,7 @@ export const Mutation = `
 
 export const Query = `
   userHistories(filters: [Filter], pagination: Pagination, sortings: [Sorting]): UserHistoryList
-  userHistory(name: String!): UserHistory
+  userHistory(id: String!): UserHistory
 `
 
 export const Types = [Filter, Pagination, Sorting, UserHistory, NewUserHistory, UserHistoryPatch, UserHistoryList]
