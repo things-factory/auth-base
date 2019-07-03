@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm'
 import { User } from '../../../entities'
 
 export const usersResolver = {
-  async users(_: any, params: ListParam, context: any) {
+  async users(_: any, params: ListParam) {
     const queryBuilder = getRepository(User).createQueryBuilder()
     buildQuery(queryBuilder, params)
     const [items, total] = await queryBuilder.getManyAndCount()

@@ -1,16 +1,13 @@
-import uuid from 'uuid/v4'
-
 import { getRepository } from 'typeorm'
 import { Appliance } from '../../../entities'
 
 export const createAppliance = {
-  async createAppliance(_, { appliance: attrs }) {
-    const repository = getRepository(Appliance)
-    const newAppliance = {
-      id: uuid(),
-      ...attrs
-    }
-
-    return await repository.save(newAppliance)
+  async createAppliance(_: any, { appliance }, context: any) {
+    return await getRepository(Appliance).save({
+      domain: context.domain,
+      creatorId: context.state.user.id,
+      updaterId: context.state.user.id,
+      ...appliance
+    })
   }
 }

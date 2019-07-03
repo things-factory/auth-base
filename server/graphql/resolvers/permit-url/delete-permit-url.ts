@@ -2,9 +2,7 @@ import { getRepository } from 'typeorm'
 import { PermitUrl } from '../../../entities'
 
 export const deletePermitUrl = {
-  async deletePermitUrl(_, { name, patch }) {
-    const repository = getRepository(PermitUrl)
-
-    return await repository.delete(name)
+  async deletePermitUrl(_: any, { name }, context: any) {
+    return getRepository(PermitUrl).delete({ domain: context.domain, name })
   }
 }

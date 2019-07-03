@@ -2,9 +2,12 @@ import { getRepository } from 'typeorm'
 import { PermitUrl } from '../../../entities'
 
 export const createPermitUrl = {
-  async createPermitUrl(_, { permitUrl: attrs }) {
-    const repository = getRepository(PermitUrl)
-
-    return await repository.save({ ...attrs })
+  async createPermitUrl(_: any, { permitUrl }, context: any) {
+    return await getRepository(PermitUrl).save({
+      domain: context.domain,
+      creatorId: context.state.user.id,
+      updaterId: context.state.user.id,
+      ...permitUrl
+    })
   }
 }

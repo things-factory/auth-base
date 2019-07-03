@@ -10,12 +10,12 @@ export const Mutation = `
   ): Appliance
 
   updateAppliance (
-    id: String!
+    name: String!
     patch: AppliancePatch!
   ): Appliance
 
   deleteAppliance (
-    id: String!
+    name: String!
   ): Appliance
 
   publishAppliance (
@@ -25,7 +25,7 @@ export const Mutation = `
 
 export const Query = `
   appliances(filters: [Filter], pagination: Pagination, sortings: [Sorting]): ApplianceList
-  appliance(id: String!): Appliance
+  appliance(name: String!): Appliance
 `
 
 export const Types = [Filter, Pagination, Sorting, Appliance, NewAppliance, AppliancePatch, ApplianceList]

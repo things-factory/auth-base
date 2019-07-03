@@ -9,6 +9,7 @@ import {
   Index,
   JoinTable,
   ManyToMany,
+  PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { Role } from './role'
@@ -18,6 +19,9 @@ const SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
 @Entity('users')
 @Index('ix_user_0', (user: User) => [user.email], { unique: true })
 export class User extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string
+
   @Column('text')
   email: string
 
@@ -27,13 +31,13 @@ export class User extends BaseEntity {
   password: string
 
   @ManyToMany(type => Role, role => role.users)
-  @JoinTable()
-  role: Role[]
+  @JoinTable({ name: 'users-roles' })
+  roles: Role[]
 
   @Column('text', {
     nullable: true
   })
-  userType: string // defulat: 'user, enum: 'user', 'admin'
+  userType: string // default: 'user, enum: 'user', 'admin'
 
   @CreateDateColumn()
   createdAt: Date
@@ -44,6 +48,7 @@ export class User extends BaseEntity {
   /* signing for jsonwebtoken */
   async sign() {
     var user = {
+      id: this.id,
       email: this.email,
       userType: this.userType
     }

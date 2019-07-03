@@ -10,12 +10,12 @@ export const Mutation = `
   ): UserHistory
 
   updateUserHistory (
-    name: String!
+    id: String!
     patch: UserHistoryPatch!
   ): UserHistory
 
   deleteUserHistory (
-    name: String!
+    id: String!
   ): UserHistory
 `
 

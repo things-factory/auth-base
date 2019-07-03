@@ -10,22 +10,18 @@ export const Mutation = `
   ): Priviledge
 
   updatePriviledge (
-    id: String!
+    name: String!
     patch: PriviledgePatch!
   ): Priviledge
 
   deletePriviledge (
-    id: String!
-  ): Priviledge
-
-  publishPriviledge (
-    id: String!
+    name: String!
   ): Priviledge
 `
 
 export const Query = `
   priviledges(filters: [Filter], pagination: Pagination, sortings: [Sorting]): PriviledgeList
-  priviledge(id: String!): Priviledge
+  priviledge(name: String!): Priviledge
 `
 
 export const Types = [Filter, Pagination, Sorting, Priviledge, NewPriviledge, PriviledgePatch, PriviledgeList]

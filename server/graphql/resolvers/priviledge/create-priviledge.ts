@@ -1,16 +1,13 @@
-import uuid from 'uuid/v4'
-
 import { getRepository } from 'typeorm'
 import { Priviledge } from '../../../entities'
 
 export const createPriviledge = {
-  async createPriviledge(_, { priviledge: attrs }) {
-    const repository = getRepository(Priviledge)
-    const newPriviledge = {
-      id: uuid(),
-      ...attrs
-    }
-
-    return await repository.save(newPriviledge)
+  async createPriviledge(_: any, { priviledge }, context: any) {
+    return await getRepository(Priviledge).save({
+      domain: context.domain,
+      creatorId: context.state.user.id,
+      updaterId: context.state.user.id,
+      ...priviledge
+    })
   }
 }

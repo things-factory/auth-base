@@ -5,8 +5,10 @@ export const UserHistory = gql`
     id: String
     domain: Domain
     userAccount: User
-    statue: String
+    status: String
     creator: User
     updater: User
+    createdAt: String
+    updatedAt: String
   }
 `

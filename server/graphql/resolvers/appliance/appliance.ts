@@ -2,11 +2,9 @@ import { getRepository } from 'typeorm'
 import { Appliance } from '../../../entities'
 
 export const applianceResolver = {
-  async appliance(_, { id }, context, info) {
-    const repository = getRepository(Appliance)
-
-    return await repository.findOne({
-      where: { domain: context.domain, id },
+  async appliance(_: any, { name }, context: any) {
+    return await getRepository(Appliance).findOne({
+      where: { domain: context.domain, name },
       relations: ['domain', 'creator', 'updater']
     })
   }

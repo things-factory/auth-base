@@ -2,14 +2,14 @@ import { getRepository } from 'typeorm'
 import { PermitUrl } from '../../../entities'
 
 export const updatePermitUrl = {
-  async updatePermitUrl(_, { name, patch }) {
+  async updatePermitUrl(_: any, { name, patch }, context: any) {
     const repository = getRepository(PermitUrl)
-
-    const permitUrl = await repository.findOne({ name })
+    const permitUrl = await repository.findOne({ where: { domain: context.domain, name } })
 
     return await repository.save({
       ...permitUrl,
-      ...patch
+      ...patch,
+      updaterId: context.state.user.id
     })
   }
 }

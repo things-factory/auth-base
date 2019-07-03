@@ -1,13 +1,17 @@
 import { getRepository } from 'typeorm'
-import { User } from '../../../entities'
+import { User, Role } from '../../../entities'
 
 export const createUser = {
-  async createUser(_, { user: attrs }) {
-    const repository = getRepository(User)
+  async createUser(_: any, { user }, context: any) {
+    if (user.roles && user.roles.length) {
+      user.roles = await getRepository(Role).findByIds(user.roles)
+    }
 
-    return await repository.save({
-      ...attrs,
-      password: User.encode(attrs.password)
+    return await getRepository(User).save({
+      creatorId: context.state.user.id,
+      updaterId: context.state.user.id,
+      ...user,
+      password: user.password ? User.encode(user.password) : null
     })
   }
 }

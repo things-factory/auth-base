@@ -5,9 +5,6 @@ import { User } from './user'
 @Entity('permit-urls')
 @Index('ix_permit_url_0', (permitUrl: PermitUrl) => [permitUrl.domain, permitUrl.name], { unique: true })
 export class PermitUrl extends DomainBaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
-
   @ManyToOne(type => Domain)
   domain: Domain
 

@@ -2,11 +2,7 @@ import { getRepository } from 'typeorm'
 import { User } from '../../../entities'
 
 export const userResolver = {
-  async user(_, { email }, context, info) {
-    const repository = getRepository(User)
-
-    return await repository.findOne({
-      where: { domain: context.domain, email }
-    })
+  async user(_: any, { email }) {
+    return await getRepository(User).findOne({ email })
   }
 }

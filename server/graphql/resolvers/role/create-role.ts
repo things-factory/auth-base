@@ -1,10 +1,21 @@
 import { getRepository } from 'typeorm'
-import { Role } from '../../../entities'
+import { Priviledge, Role, User } from '../../../entities'
 
 export const createRole = {
-  async createRole(_, { role: attrs }) {
-    const repository = getRepository(Role)
+  async createRole(_: any, { role }, context: any) {
+    if (role.priviledges && role.priviledges.length) {
+      role.priviledges = await getRepository(Priviledge).findByIds(role.priviledges)
+    }
 
-    return await repository.save({ ...attrs })
+    if (role.users && role.users.length) {
+      role.users = await getRepository(User).findByIds(role.users)
+    }
+
+    return await getRepository(Role).save({
+      domain: context.domain,
+      creatorId: context.state.user.id,
+      updaterId: context.state.user.id,
+      ...role
+    })
   }
 }
