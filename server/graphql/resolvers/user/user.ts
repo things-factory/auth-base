@@ -3,6 +3,9 @@ import { User } from '../../../entities'
 
 export const userResolver = {
   async user(_: any, { email }) {
-    return await getRepository(User).findOne({ email })
+    return await getRepository(User).findOne({
+      where: { email },
+      relations: ['roles']
+    })
   }
 }

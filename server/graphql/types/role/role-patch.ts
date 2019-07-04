@@ -4,7 +4,7 @@ export const RolePatch = gql`
   input RolePatch {
     name: String
     users: [String]
-    priviledge: [String]
+    priviledges: [String]
     description: String
   }
 `

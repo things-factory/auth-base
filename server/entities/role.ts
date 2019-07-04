@@ -7,6 +7,9 @@ import { PrefixingKeyValueCache } from 'apollo-server-caching'
 @Entity('roles')
 @Index('ix_role_0', (role: Role) => [role.domain, role.name], { unique: true })
 export class Role extends DomainBaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: String
+
   @ManyToOne(type => Domain)
   domain: Domain
 
