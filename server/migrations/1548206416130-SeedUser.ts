@@ -5,6 +5,7 @@ import { User } from '../entities'
 
 const SEED_USERS = [
   {
+    name: 'Admin',
     email: 'admin@hatiolab.com',
     password: 'admin',
     userType: 'admin'
