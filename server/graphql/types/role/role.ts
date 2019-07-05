@@ -10,7 +10,7 @@ export const Role = gql`
     description: String
     creator: User
     updater: User
-    creratedAt: String
+    createdAt: String
     updatedAt: String
   }
 `
