@@ -26,7 +26,7 @@ export default function bootstrap() {
     document.dispatchEvent(
       new CustomEvent('notify', {
         detail: {
-          type: result ? 'info' : 'error',
+          level: result ? 'info' : 'error',
           message
         }
       })
