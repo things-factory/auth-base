@@ -21,7 +21,7 @@ export const Mutation = `
 
 export const Query = `
   users(filters: [Filter], pagination: Pagination, sortings: [Sorting]): UserList
-  user(email: String!): User
+  user(email: String!): User @priviledge(role: "admin", priviledge: "get user")
 `
 
 export const Types = [Filter, Pagination, Sorting, User, NewUser, UserPatch, UserList]

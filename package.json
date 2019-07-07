@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-base",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -27,11 +27,6 @@
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
-    "@things-factory/auth-provider-jwt": "*",
-    "@things-factory/auth-ui-jwt": "*",
-    "@things-factory/layout-ui": "*",
-    "@things-factory/menu-ui": "*",
-    "@things-factory/resource-ui": "*",
-    "@things-factory/setting-ui": "*"
+    "@things-factory/tester": "*"
   }
 }

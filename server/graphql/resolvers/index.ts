@@ -15,3 +15,5 @@ export const mutations = [
   Priviledge.Mutation,
   Appliance.Mutation
 ]
+
+export const directives = [Priviledge.Directive]

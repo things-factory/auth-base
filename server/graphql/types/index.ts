@@ -24,3 +24,5 @@ export const types = [
   ...Priviledge.Types,
   ...Appliance.Types
 ]
+
+export const directives = [...Priviledge.Directives]
