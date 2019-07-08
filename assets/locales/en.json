@@ -1,0 +1,9 @@
+{
+  "field.sign in": "Sign In",
+  "field.email": "Email Address",
+  "field.password": "Password",
+  "field.sign up": "Sign Up",
+  "field.sign out": "Sign Out",
+  "field.token": "Token",
+  "text.auth profile": "Profile"
+}

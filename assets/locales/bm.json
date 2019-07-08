@@ -1,0 +1,9 @@
+{
+  "field.sign in": "Log Masuk",
+  "field.email": "Alamat E-mel",
+  "field.password": "Kata Laluan",
+  "field.sign up": "Daftar Akaun",
+  "field.sign out": "Log Keluar",
+  "field.token": "Token",
+  "text.auth profile": "Profil"
+}

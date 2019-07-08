@@ -1,0 +1,9 @@
+{
+  "field.sign in": "로그인",
+  "field.email": "이메일 주소",
+  "field.password": "암호",
+  "field.sign up": "회원가입",
+  "field.sign out": "로그아웃",
+  "field.token": "토큰",
+  "text.auth profile": "프로필"
+}
