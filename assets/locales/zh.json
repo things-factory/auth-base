@@ -1,9 +1,5 @@
 {
-  "field.sign in": "登入",
   "field.email": "电子邮件地址",
   "field.password": "密码",
-  "field.sign up": "注册",
-  "field.sign out": "登出",
-  "field.token": "符记",
-  "text.auth profile": "剖面"
+  "field.token": "符记"
 }
