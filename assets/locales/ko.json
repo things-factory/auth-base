@@ -1,5 +1,5 @@
 {
-  "field.email": "이메일 주소",
-  "field.password": "암호",
+  "field.email": "이메일",
+  "field.password": "패스워드",
   "field.token": "토큰"
 }
