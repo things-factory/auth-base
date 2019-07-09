@@ -2,7 +2,6 @@ import { Domain, DomainBaseEntity } from '@things-factory/shell'
 import { Column, Entity, Index, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, JoinTable } from 'typeorm'
 import { Priviledge } from './priviledge'
 import { User } from './user'
-import { PrefixingKeyValueCache } from 'apollo-server-caching'
 
 @Entity('roles')
 @Index('ix_role_0', (role: Role) => [role.domain, role.name], { unique: true })
