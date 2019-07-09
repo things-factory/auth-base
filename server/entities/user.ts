@@ -1,4 +1,3 @@
-import { BaseEntity } from '@things-factory/shell'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import {
@@ -9,6 +8,7 @@ import {
   Index,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
@@ -19,7 +19,7 @@ const SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
 
 @Entity('users')
 @Index('ix_user_0', (user: User) => [user.email], { unique: true })
-export class User extends BaseEntity {
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
@@ -42,6 +42,16 @@ export class User extends BaseEntity {
     nullable: true
   })
   userType: string // default: 'user, enum: 'user', 'admin'
+
+  @ManyToOne(type => User, {
+    nullable: true
+  })
+  creator: User
+
+  @ManyToOne(type => User, {
+    nullable: true
+  })
+  updater: User
 
   @CreateDateColumn()
   createdAt: Date

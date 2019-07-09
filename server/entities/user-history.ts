@@ -1,22 +1,19 @@
-import { Domain, DomainBaseEntity } from '@things-factory/shell'
-import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Domain } from '@things-factory/shell'
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { User } from './user'
 
 @Entity('user-histories')
 @Index('ix_user_histories_0', (userHistory: UserHistory) => [userHistory.domain, userHistory.id], { unique: true })
-export class UserHistory extends DomainBaseEntity {
+export class UserHistory {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
   @ManyToOne(type => Domain)
   domain: Domain
 
-  @Column('text', {
+  @ManyToOne(type => User, {
     nullable: true
   })
-  userAccountId: string
-
-  @ManyToOne(type => User)
   userAccount: User
 
   @Column('text', {
@@ -24,9 +21,19 @@ export class UserHistory extends DomainBaseEntity {
   })
   status: string
 
-  @ManyToOne(type => User)
+  @ManyToOne(type => User, {
+    nullable: true
+  })
   creator: User
 
-  @ManyToOne(type => User)
+  @ManyToOne(type => User, {
+    nullable: true
+  })
   updater: User
+
+  @CreateDateColumn()
+  createdAt: Date
+
+  @UpdateDateColumn()
+  updatedAt: Date
 }
