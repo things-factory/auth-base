@@ -35,7 +35,7 @@ export class User {
   password: string
 
   @ManyToMany(type => Role, role => role.users)
-  @JoinTable({ name: 'users-roles' })
+  @JoinTable({ name: 'users_roles' })
   roles: Role[]
 
   @Column('text', {

@@ -2,7 +2,7 @@ import { Domain } from '@things-factory/shell'
 import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { User } from './user'
 
-@Entity('permit-urls')
+@Entity()
 @Index('ix_permit_url_0', (permitUrl: PermitUrl) => [permitUrl.domain, permitUrl.name], { unique: true })
 export class PermitUrl {
   @PrimaryGeneratedColumn('uuid')

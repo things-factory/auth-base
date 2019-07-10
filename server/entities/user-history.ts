@@ -2,7 +2,7 @@ import { Domain } from '@things-factory/shell'
 import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { User } from './user'
 
-@Entity('user-histories')
+@Entity()
 @Index('ix_user_histories_0', (userHistory: UserHistory) => [userHistory.domain, userHistory.id], { unique: true })
 export class UserHistory {
   @PrimaryGeneratedColumn('uuid')

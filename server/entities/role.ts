@@ -29,7 +29,7 @@ export class Role {
   users: User[]
 
   @ManyToMany(type => Priviledge, priviledge => priviledge.roles)
-  @JoinTable({ name: 'roles-priviledges' })
+  @JoinTable({ name: 'roles_priviledges' })
   priviledges: Priviledge[]
 
   @Column('text', {
