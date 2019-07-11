@@ -22,7 +22,7 @@ export class Role {
   @ManyToOne(type => Domain)
   domain: Domain
 
-  @Column('text')
+  @Column()
   name: string
 
   @ManyToMany(type => User, user => user.roles)
@@ -32,7 +32,7 @@ export class Role {
   @JoinTable({ name: 'roles_priviledges' })
   priviledges: Priviledge[]
 
-  @Column('text', {
+  @Column({
     nullable: true
   })
   description: string

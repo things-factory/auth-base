@@ -23,13 +23,13 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column('text')
+  @Column()
   name: string
 
-  @Column('text')
+  @Column()
   email: string
 
-  @Column('text', {
+  @Column({
     nullable: true
   })
   password: string
@@ -38,7 +38,7 @@ export class User {
   @JoinTable({ name: 'users_roles' })
   roles: Role[]
 
-  @Column('text', {
+  @Column({
     nullable: true
   })
   userType: string // default: 'user, enum: 'user', 'admin'

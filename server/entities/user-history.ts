@@ -16,7 +16,7 @@ export class UserHistory {
   })
   userAccount: User
 
-  @Column('text', {
+  @Column({
     nullable: true
   })
   status: string

@@ -21,13 +21,13 @@ export class Priviledge {
   @ManyToOne(type => Domain)
   domain: Domain
 
-  @Column('text')
+  @Column()
   name: string
 
-  @Column('text')
+  @Column()
   category: string
 
-  @Column('text', {
+  @Column({
     nullable: true
   })
   description: string

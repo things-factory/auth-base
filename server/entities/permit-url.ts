@@ -11,18 +11,18 @@ export class PermitUrl {
   @ManyToOne(type => Domain)
   domain: Domain
 
-  @Column('text')
+  @Column()
   name: string
 
-  @Column('text', {
+  @Column({
     nullable: true
   })
   description: string
 
-  @Column('text')
+  @Column()
   type: string
 
-  @Column('boolean', {
+  @Column({
     nullable: true,
     default: false
   })

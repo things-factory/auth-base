@@ -13,22 +13,22 @@ export class Appliance {
   @ManyToOne(type => Domain)
   domain: Domain
 
-  @Column('text')
+  @Column()
   applianceId: string
 
-  @Column('text')
+  @Column()
   name: string
 
-  @Column('text')
+  @Column()
   brand: string
 
-  @Column('text')
+  @Column()
   model: string
 
-  @Column('text')
+  @Column()
   type: string
 
-  @Column('text', {
+  @Column({
     nullable: true
   })
   description: string
