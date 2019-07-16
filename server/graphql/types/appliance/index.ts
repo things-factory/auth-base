@@ -17,10 +17,6 @@ export const Mutation = `
   deleteAppliance (
     name: String!
   ): Appliance
-
-  publishAppliance (
-    id: String!
-  ): Appliance
 `
 
 export const Query = `
