@@ -1,5 +1,5 @@
 {
-  "field.email": "Email Address",
-  "field.password": "Password",
-  "field.token": "Token"
+  "field.email": "email address",
+  "field.password": "password",
+  "field.token": "token"
 }
