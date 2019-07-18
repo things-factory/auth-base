@@ -12,7 +12,7 @@ const SEED_USERS = [
   }
 ]
 
-export class seedUsers1525758367829 implements MigrationInterface {
+export class SeedUsers1525758367829 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     const repository = getRepository(User)
 
