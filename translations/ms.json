@@ -1,5 +1,14 @@
 {
-  "field.email": "alamat e-mel",
-  "field.password": "kata laluan",
-  "field.token": "token"
+  "field.email": "emel",
+  "field.password": "kata-laluan",
+  "field.token": "token",
+  "field.appliance_id": "perkakas",
+  "field.brand": "jenama",
+  "field.model": "model",
+  "field.active": "aktif",
+  "field.category": "kategori",
+  "field.roles": "peranan",
+  "field.priviledges": "keistimewaan",
+  "field.user": "pengguna",
+  "field.user_account": "akaun pengguna"
 }
