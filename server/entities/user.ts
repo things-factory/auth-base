@@ -27,6 +27,9 @@ export class User {
   name: string
 
   @Column()
+  description: string
+
+  @Column()
   email: string
 
   @Column({

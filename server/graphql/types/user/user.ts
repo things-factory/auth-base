@@ -4,6 +4,7 @@ export const User = gql`
   type User {
     id: String
     name: String
+    description: String
     email: String
     password: String
     roles: [Role]
