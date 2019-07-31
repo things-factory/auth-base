@@ -1,5 +1,5 @@
 const DEFAULT_AUTH_REQUIRED_EVENT = 'auth-required'
-const DEFAULT_ROUTE_PATH = '/'
+const DEFAULT_ROUTE_PAGE = ''
 const DEFAULT_CONTEXT_PATH = ''
 
 const NOOP = () => {}
@@ -19,7 +19,7 @@ class ClientAuth {
 
   constructor({
     provider,
-    defaultRoutePage = DEFAULT_ROUTE_PATH,
+    defaultRoutePage = DEFAULT_ROUTE_PAGE,
     contextPath = DEFAULT_CONTEXT_PATH,
     authRequiredEvent = DEFAULT_AUTH_REQUIRED_EVENT,
     signupPath = 'signup',
