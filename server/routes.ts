@@ -27,7 +27,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       }
 
       context.cookies.set('access_token', token, {
-        httpOnly: false,
+        httpOnly: true,
         maxAge: MAX_AGE
       })
     } catch (e) {
@@ -49,7 +49,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       }
 
       context.cookies.set('access_token', token, {
-        httpOnly: false,
+        httpOnly: true,
         maxAge: MAX_AGE
       })
     } catch (e) {
@@ -66,7 +66,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       var token = await authcheck(context.state.user.email)
 
       context.cookies.set('access_token', token, {
-        httpOnly: false,
+        httpOnly: true,
         maxAge: MAX_AGE
       })
 
@@ -94,7 +94,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       }
 
       context.cookies.set('access_token', token, {
-        httpOnly: false,
+        httpOnly: true,
         maxAge: MAX_AGE
       })
     } catch (e) {
