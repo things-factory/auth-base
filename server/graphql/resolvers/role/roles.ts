@@ -3,9 +3,9 @@ import { getRepository } from 'typeorm'
 import { Role } from '../../../entities'
 
 export const rolesResolver = {
-  async roles(_: any, params: ListParam) {
+  async roles(_: any, params: ListParam, context: any) {
     const queryBuilder = getRepository(Role).createQueryBuilder()
-    buildQuery(queryBuilder, params)
+    buildQuery(queryBuilder, params, context)
     const [items, total] = await queryBuilder
       .leftJoinAndSelect('Role.domain', 'Domain')
       .leftJoinAndSelect('Role.users', 'Users')
