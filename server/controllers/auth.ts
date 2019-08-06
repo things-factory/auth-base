@@ -26,7 +26,7 @@ export async function signup(attrs) {
 export async function signin(attrs) {
   const repository = getRepository(User)
 
-  const user = await repository.findOne({ email: attrs.email })
+  const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain'] })
 
   if (!user) {
     throw new Error('user not found.')
@@ -41,8 +41,7 @@ export async function signin(attrs) {
 
 export async function authcheck(email) {
   const repository = getRepository(User)
-
-  const user = await repository.findOne({ email })
+  const user = await repository.findOne({ where: { email }, relations: ['domain'] })
 
   if (!user) {
     throw new Error('user not found.')
@@ -54,7 +53,7 @@ export async function authcheck(email) {
 export async function changePwd(attrs, newPass) {
   const repository = getRepository(User)
 
-  const user = await repository.findOne({ email: attrs.email })
+  const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain'] })
 
   if (!user) {
     throw new Error('user not found.')

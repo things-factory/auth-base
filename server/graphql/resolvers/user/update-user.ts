@@ -5,7 +5,7 @@ export const updateUser = {
   async updateUser(_: any, { email, patch }, context: any) {
     const repository = getRepository(User)
     const user = await repository.findOne({
-      where: { domain: context, email },
+      where: { domain: context.domain, email },
       relations: ['domain', 'roles']
     })
 
