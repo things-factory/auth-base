@@ -12,13 +12,14 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
+import { Domain } from '@things-factory/shell'
 import { Role } from './role'
 
 /* TODO SECRET KEY를 변경할 수 있는 방법을 제시해야 한다. */
 const SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
 
 @Entity('users')
-@Index('ix_user_0', (user: User) => [user.email], { unique: true })
+@Index('ix_user_0', (user: User) => [user.domain, user.email], { unique: true })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -30,6 +31,9 @@ export class User {
     nullable: true
   })
   description: string
+
+  @ManyToOne(type => Domain)
+  domain: Domain
 
   @Column()
   email: string
@@ -69,7 +73,8 @@ export class User {
     var user = {
       id: this.id,
       email: this.email,
-      userType: this.userType
+      userType: this.userType,
+      domain: this.domain
     }
 
     return await jwt.sign(user, SECRET, {

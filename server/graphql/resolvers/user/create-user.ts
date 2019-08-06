@@ -8,6 +8,7 @@ export const createUser = {
     }
 
     return await getRepository(User).save({
+      domain: context.domain,
       creatorId: context.state.user.id,
       updaterId: context.state.user.id,
       ...user,

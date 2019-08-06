@@ -9,6 +9,7 @@ export const User = gql`
     password: String
     roles: [Role]
     userType: String
+    domain: Domain
     creator: User
     updater: User
     createdAt: String

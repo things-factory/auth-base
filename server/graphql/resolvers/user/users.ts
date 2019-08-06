@@ -8,6 +8,7 @@ export const usersResolver = {
     buildQuery(queryBuilder, params)
     const [items, total] = await queryBuilder
       .leftJoinAndSelect('User.roles', 'Roles')
+      .leftJoinAndSelect('User.domain', 'Domain')
       .leftJoinAndSelect('Roles.priviledges', 'Priviledges')
       .leftJoinAndSelect('Roles.users', 'Users')
       .getManyAndCount()

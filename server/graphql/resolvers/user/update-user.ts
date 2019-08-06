@@ -5,8 +5,8 @@ export const updateUser = {
   async updateUser(_: any, { email, patch }, context: any) {
     const repository = getRepository(User)
     const user = await repository.findOne({
-      where: { email },
-      relations: ['roles']
+      where: { domain: context, email },
+      relations: ['domain', 'roles']
     })
 
     const roleIds = user.roles.map(role => role.id)
