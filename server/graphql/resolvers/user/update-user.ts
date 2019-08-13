@@ -12,7 +12,7 @@ export const updateUser = {
     return await repository.save({
       ...user,
       ...patch,
-      roles: await getRepository(Role).findByIds(patch.roles.map(role => role.id)),
+      roles: await getRepository(Role).findByIds(patch.roles),
       updaterId: context.state.user.id
     })
   }
