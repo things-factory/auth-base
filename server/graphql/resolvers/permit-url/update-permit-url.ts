@@ -9,7 +9,7 @@ export const updatePermitUrl = {
     return await repository.save({
       ...permitUrl,
       ...patch,
-      updaterId: context.state.user.id
+      updater: context.state.user
     })
   }
 }

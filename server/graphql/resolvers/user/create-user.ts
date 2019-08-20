@@ -9,8 +9,8 @@ export const createUser = {
 
     return await getRepository(User).save({
       domain: context.domain,
-      creatorId: context.state.user.id,
-      updaterId: context.state.user.id,
+      creator: context.state.user,
+      updater: context.state.user,
       ...user,
       password: user.password ? User.encode(user.password) : null
     })

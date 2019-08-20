@@ -22,7 +22,7 @@ export const updatePriviledge = {
       ...priviledge,
       ...patch,
       roles: await getRepository(Role).findByIds(roleIds),
-      updaterId: context.state.user.id
+      updater: context.state.user
     })
   }
 }

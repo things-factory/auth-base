@@ -13,8 +13,8 @@ export const createRole = {
 
     return await getRepository(Role).save({
       domain: context.domain,
-      creatorId: context.state.user.id,
-      updaterId: context.state.user.id,
+      updater: context.state.user,
+      creator: context.state.user,
       ...role
     })
   }

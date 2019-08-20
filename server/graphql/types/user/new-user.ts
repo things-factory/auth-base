@@ -6,7 +6,7 @@ export const NewUser = gql`
     description: String
     email: String!
     password: String
-    roles: [String]
+    roles: [RolePatch]
     userType: String
   }
 `

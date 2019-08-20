@@ -13,7 +13,7 @@ export const updateUser = {
       ...user,
       ...patch,
       roles: await getRepository(Role).findByIds(patch.roles),
-      updaterId: context.state.user.id
+      updater: context.state.user
     })
   }
 }

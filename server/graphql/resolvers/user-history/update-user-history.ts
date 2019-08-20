@@ -9,7 +9,7 @@ export const updateUserHistory = {
     return await repository.save({
       ...userHistory,
       ...patch,
-      updaterId: context.state.user.id
+      updater: context.state.user
     })
   }
 }

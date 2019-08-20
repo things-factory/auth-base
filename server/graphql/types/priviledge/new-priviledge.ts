@@ -5,6 +5,6 @@ export const NewPriviledge = gql`
     name: String!
     category: String!
     description: String
-    roles: [String]
+    roles: [RolePatch]
   }
 `

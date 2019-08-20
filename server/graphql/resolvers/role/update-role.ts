@@ -32,7 +32,7 @@ export const updateRole = {
       ...patch,
       users: await getRepository(User).find({ email: In(userEmails) }),
       priviledges: await getRepository(Priviledge).findByIds(priviledgeIds),
-      updaterId: context.state.user.id
+      updater: context.state.user
     })
   }
 }
