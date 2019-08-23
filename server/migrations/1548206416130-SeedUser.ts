@@ -15,14 +15,17 @@ const SEED_USERS = [
 export class SeedUsers1525758367829 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     const repository = getRepository(User)
+    const domain = await getRepository(Domain).findOne({ where: { name: 'SYSTEM' } })
 
     try {
-      SEED_USERS.forEach(async user => {
+      for (let i = 0; i < SEED_USERS.length; i++) {
+        const user = SEED_USERS[i]
         await repository.save({
+          domain,
           ...user,
           password: User.encode(user.password)
         })
-      })
+      }
     } catch (e) {
       console.error(e)
     }
