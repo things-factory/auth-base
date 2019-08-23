@@ -4,6 +4,7 @@ import * as PermitUrl from './permit-url'
 import * as Role from './role'
 import * as Priviledge from './priviledge'
 import * as Appliance from './appliance'
+import { Filter, Pagination, Sorting, ObjectRef } from '@things-factory/shell'
 
 export const queries = [User.Query, UserHistory.Query, PermitUrl.Query, Role.Query, Priviledge.Query, Appliance.Query]
 
@@ -17,6 +18,10 @@ export const mutations = [
 ]
 
 export const types = [
+  Filter,
+  Pagination,
+  Sorting,
+  ObjectRef,
   ...User.Types,
   ...UserHistory.Types,
   ...PermitUrl.Types,

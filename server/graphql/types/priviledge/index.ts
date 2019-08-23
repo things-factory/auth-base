@@ -1,4 +1,3 @@
-import { Filter, Pagination, Sorting } from '@things-factory/shell'
 import { NewPriviledge } from './new-priviledge'
 import { Priviledge } from './priviledge'
 import { PriviledgeList } from './priviledge-list'
@@ -16,7 +15,7 @@ export const Mutation = `
 
   deletePriviledge (
     name: String!
-  ): Priviledge
+  ): Boolean
 `
 
 export const Query = `
@@ -26,4 +25,4 @@ export const Query = `
 
 export const Directives = [`directive @priviledge(role: String, priviledge: String) on FIELD_DEFINITION`]
 
-export const Types = [Filter, Pagination, Sorting, Priviledge, NewPriviledge, PriviledgePatch, PriviledgeList]
+export const Types = [Priviledge, NewPriviledge, PriviledgePatch, PriviledgeList]

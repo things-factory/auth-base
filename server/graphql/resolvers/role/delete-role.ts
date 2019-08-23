@@ -3,6 +3,7 @@ import { Role } from '../../../entities'
 
 export const deleteRole = {
   async deleteRole(_: any, { name }, context: any) {
-    return await getRepository(Role).delete({ domain: context.domain, name })
+    await getRepository(Role).delete({ domain: context.domain, name })
+    return true
   }
 }

@@ -1,4 +1,3 @@
-import { Filter, Pagination, Sorting } from '@things-factory/shell'
 import { NewUserHistory } from './new-user-history'
 import { UserHistory } from './user-history'
 import { UserHistoryList } from './user-history-list'
@@ -16,7 +15,7 @@ export const Mutation = `
 
   deleteUserHistory (
     id: String!
-  ): UserHistory
+  ): Boolean
 `
 
 export const Query = `
@@ -24,4 +23,4 @@ export const Query = `
   userHistory(id: String!): UserHistory
 `
 
-export const Types = [Filter, Pagination, Sorting, UserHistory, NewUserHistory, UserHistoryPatch, UserHistoryList]
+export const Types = [UserHistory, NewUserHistory, UserHistoryPatch, UserHistoryList]

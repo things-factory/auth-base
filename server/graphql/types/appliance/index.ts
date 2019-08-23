@@ -1,8 +1,7 @@
 import { Appliance } from './appliance'
-import { NewAppliance } from './new-appliance'
-import { AppliancePatch } from './appliance-patch'
 import { ApplianceList } from './appliance-list'
-import { Filter, Pagination, Sorting } from '@things-factory/shell'
+import { AppliancePatch } from './appliance-patch'
+import { NewAppliance } from './new-appliance'
 
 export const Mutation = `
   createAppliance (
@@ -16,7 +15,7 @@ export const Mutation = `
 
   deleteAppliance (
     name: String!
-  ): Appliance
+  ): Boolean
 `
 
 export const Query = `
@@ -24,4 +23,4 @@ export const Query = `
   appliance(name: String!): Appliance
 `
 
-export const Types = [Filter, Pagination, Sorting, Appliance, NewAppliance, AppliancePatch, ApplianceList]
+export const Types = [Appliance, NewAppliance, AppliancePatch, ApplianceList]

@@ -4,10 +4,11 @@ export const UserPatch = gql`
   input UserPatch {
     id: String
     name: String
+    domain: ObjectRef
     description: String
     email: String
     password: String
-    roles: [RolePatch]
+    roles: [ObjectRef]
     userType: String
   }
 `

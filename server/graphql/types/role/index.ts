@@ -1,4 +1,3 @@
-import { Filter, Pagination, Sorting } from '@things-factory/shell'
 import { NewRole } from './new-role'
 import { Role } from './role'
 import { RoleList } from './role-list'
@@ -24,4 +23,4 @@ export const Query = `
   role(name: String!): Role
 `
 
-export const Types = [Filter, Pagination, Sorting, Role, NewRole, RolePatch, RoleList]
+export const Types = [Role, NewRole, RolePatch, RoleList]

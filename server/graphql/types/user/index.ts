@@ -16,7 +16,7 @@ export const Mutation = `
 
   deleteUser (
     email: String!
-  ): User
+  ): Booelan
 `
 
 export const Query = `
@@ -24,4 +24,4 @@ export const Query = `
   user(email: String!): User @priviledge(role: "admin", priviledge: "get user")
 `
 
-export const Types = [Filter, Pagination, Sorting, User, NewUser, UserPatch, UserList]
+export const Types = [User, NewUser, UserPatch, UserList]

@@ -1,5 +1,6 @@
+import { Domain } from '@things-factory/shell'
 import { getRepository } from 'typeorm'
-import { User, Role } from '../../../entities'
+import { Role, User } from '../../../entities'
 
 export const createUser = {
   async createUser(_: any, { user }, context: any) {
@@ -7,8 +8,9 @@ export const createUser = {
       user.roles = await getRepository(Role).findByIds(user.roles)
     }
 
+    user.domain = await getRepository(Domain).findOne(user.domain.id)
+
     return await getRepository(User).save({
-      domain: context.domain,
       creator: context.state.user,
       updater: context.state.user,
       ...user,

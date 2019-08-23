@@ -1,4 +1,3 @@
-import { Filter, Pagination, Sorting } from '@things-factory/shell'
 import { NewPermitUrl } from './new-permit-url'
 import { PermitUrl } from './permit-url'
 import { PermitUrlList } from './permit-url-list'
@@ -16,7 +15,7 @@ export const Mutation = `
 
   deletePermitUrl (
     name: String!
-  ): PermitUrl
+  ): Boolean
 `
 
 export const Query = `
@@ -24,4 +23,4 @@ export const Query = `
   permitUrl(name: String!): PermitUrl
 `
 
-export const Types = [Filter, Pagination, Sorting, PermitUrl, NewPermitUrl, PermitUrlPatch, PermitUrlList]
+export const Types = [PermitUrl, NewPermitUrl, PermitUrlPatch, PermitUrlList]
