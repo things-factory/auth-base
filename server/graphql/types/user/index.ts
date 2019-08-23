@@ -16,7 +16,7 @@ export const Mutation = `
 
   deleteUser (
     email: String!
-  ): Booelan
+  ): Boolean
 `
 
 export const Query = `
