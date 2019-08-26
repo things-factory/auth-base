@@ -3,7 +3,7 @@ import { User } from '../../../entities'
 
 export const userResolver = {
   async user(_: any, { email }, context: any) {
-    const systemFlag = context && context.domain && !context.domain.systemFlag
+    const systemFlag = context && context.domain && context.domain.systemFlag
     let where = {}
     if (!systemFlag) {
       where = { domain: context.domain }
