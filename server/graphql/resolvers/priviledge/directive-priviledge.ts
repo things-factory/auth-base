@@ -9,7 +9,26 @@ export const directivePriviledge = {
     const connection = getRepository(User).metadata.connection
     const em = new EntityManager(connection)
     const priviledges = await em.query(
-      'SELECT DISTINCT rp.PRIVILEDGES_ID FROM USERS_ROLES ur INNER JOIN ROLES_PRIVILEDGES rp on ur.roles_id = rp.roles_id WHERE ur.users_id = :id',
+      `
+        SELECT 
+          name
+        FROM
+          priviledges
+        WHERE
+          id
+        IN (
+          SELECT
+            DISTINCT RP.priviledges_id
+          FROM
+            users_roles UR
+          INNER JOIN
+            roles_priviledges RP
+          ON
+            UR.roles_id = RP.roles_id
+          WHERE
+            UR.users_id = :id
+        )
+      `,
       [
         {
           id: context.state.user.id

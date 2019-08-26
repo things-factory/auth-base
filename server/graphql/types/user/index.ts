@@ -6,21 +6,21 @@ import { UserPatch } from './user-patch'
 export const Mutation = `
   createUser (
     user: NewUser!
-  ): User @priviledge(priviledge: "create user")
+  ): User @priviledge(priviledge: "mutation")
 
   updateUser (
     email: String!
     patch: UserPatch!
-  ): User @priviledge(priviledge: "update user")
+  ): User @priviledge(priviledge: "mutation")
 
   deleteUser (
     email: String!
-  ): Boolean @priviledge(priviledge: "delete user")
+  ): Boolean @priviledge(priviledge: "mutation")
 `
 
 export const Query = `
-  users(filters: [Filter], pagination: Pagination, sortings: [Sorting]): UserList @priviledge(priviledge: "get users")
-  user(email: String!): User @priviledge(priviledge: "get user")
+  users(filters: [Filter], pagination: Pagination, sortings: [Sorting]): UserList @priviledge(priviledge: "query")
+  user(email: String!): User @priviledge(priviledge: "query")
 `
 
 export const Types = [User, NewUser, UserPatch, UserList]
