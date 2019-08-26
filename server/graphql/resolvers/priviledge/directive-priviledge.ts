@@ -29,11 +29,7 @@ export const directivePriviledge = {
             UR.users_id = :id
         )
       `,
-      [
-        {
-          id: context.state.user.id
-        }
-      ]
+      [context.state.user.id]
     )
 
     if (priviledges.includes(args.priviledge)) {
