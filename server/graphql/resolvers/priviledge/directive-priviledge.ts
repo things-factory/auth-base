@@ -32,7 +32,8 @@ export const directivePriviledge = {
       [context.state.user.id]
     )
 
-    if (priviledges.includes(args.priviledge)) {
+    const priviledgeNames = priviledges.map(priviledge => priviledge.name)
+    if (priviledgeNames.includes(args.priviledge)) {
       next()
     } else {
       throw new Error(`Unauthorized!`)
