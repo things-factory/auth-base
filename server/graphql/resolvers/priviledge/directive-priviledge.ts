@@ -1,5 +1,5 @@
-import { EntityManager, Connection, getRepository } from 'typeorm'
-import { Priviledge, User } from '../../../entities'
+import { EntityManager, getRepository } from 'typeorm'
+import { User } from '../../../entities'
 
 export const directivePriviledge = {
   async priviledge(next, root, args, context, info) {
@@ -16,7 +16,6 @@ export const directivePriviledge = {
         }
       ]
     )
-    await em.release()
 
     if (priviledges.includes(args.priviledge)) {
       next()
