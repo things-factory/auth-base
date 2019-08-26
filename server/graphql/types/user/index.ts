@@ -1,4 +1,3 @@
-import { Filter, Pagination, Sorting } from '@things-factory/shell'
 import { NewUser } from './new-user'
 import { User } from './user'
 import { UserList } from './user-list'
@@ -7,21 +6,21 @@ import { UserPatch } from './user-patch'
 export const Mutation = `
   createUser (
     user: NewUser!
-  ): User
+  ): User @priviledge(priviledge: "create user")
 
   updateUser (
     email: String!
     patch: UserPatch!
-  ): User
+  ): User @priviledge(priviledge: "update user")
 
   deleteUser (
     email: String!
-  ): Boolean
+  ): Boolean @priviledge(priviledge: "delete user")
 `
 
 export const Query = `
-  users(filters: [Filter], pagination: Pagination, sortings: [Sorting]): UserList
-  user(email: String!): User @priviledge(role: "admin", priviledge: "get user")
+  users(filters: [Filter], pagination: Pagination, sortings: [Sorting]): UserList @priviledge(priviledge: "get users")
+  user(email: String!): User @priviledge(priviledge: "get user")
 `
 
 export const Types = [User, NewUser, UserPatch, UserList]

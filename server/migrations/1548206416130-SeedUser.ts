@@ -1,6 +1,5 @@
-import { MigrationInterface, QueryRunner, Repository } from 'typeorm'
-import { getRepository } from 'typeorm'
 import { Domain } from '@things-factory/shell'
+import { getRepository, MigrationInterface, QueryRunner } from 'typeorm'
 import { User } from '../entities'
 
 const SEED_USERS = [
