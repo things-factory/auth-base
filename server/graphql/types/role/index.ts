@@ -15,7 +15,11 @@ export const Mutation = `
 
   deleteRole (
     name: String!
-  ): Role
+  ): Boolean
+
+  deleteRoles (
+    names: [String]!
+  ): Boolean
 `
 
 export const Query = `
