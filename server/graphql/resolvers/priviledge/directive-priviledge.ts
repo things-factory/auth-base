@@ -12,7 +12,8 @@ export const directivePriviledge = {
     const priviledges = await em.query(
       `
         SELECT 
-          name
+          name,
+          category
         FROM
           priviledges
         WHERE
@@ -33,8 +34,10 @@ export const directivePriviledge = {
       [context.state.user.id]
     )
 
-    const priviledgeNames = priviledges.map(priviledge => priviledge.name)
-    if (priviledgeNames.includes(args.priviledge)) {
+    const assignPriviledge = priviledges.map(priviledge => {
+      return `${priviledge.category}-${priviledge.name}`
+    })
+    if (assignPriviledge.includes(`${args.category}-${args.priviledge}`)) {
       return next()
     } else {
       throw new Error(`Unauthorized!`)

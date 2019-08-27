@@ -23,6 +23,6 @@ export const Query = `
   priviledge(name: String!): Priviledge
 `
 
-export const Directives = [`directive @priviledge(role: String, priviledge: String) on FIELD_DEFINITION`]
+export const Directives = [`directive @priviledge(category: String, priviledge: String) on FIELD_DEFINITION`]
 
 export const Types = [Priviledge, NewPriviledge, PriviledgePatch, PriviledgeList]

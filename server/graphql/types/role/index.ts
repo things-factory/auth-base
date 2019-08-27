@@ -6,25 +6,25 @@ import { RolePatch } from './role-patch'
 export const Mutation = `
   createRole (
     role: NewRole!
-  ): Role
+  ): Role @priviledge(category: "role", priviledge: "mutation")
 
   updateRole (
     name: String!
     patch: RolePatch!
-  ): Role
+  ): Role @priviledge(category: "role", priviledge: "mutation")
 
   deleteRole (
     name: String!
-  ): Boolean
+  ): Boolean @priviledge(category: "role", priviledge: "mutation")
 
   deleteRoles (
     names: [String]!
-  ): Boolean
+  ): Boolean @priviledge(category: "role", priviledge: "mutation")
 `
 
 export const Query = `
-  roles(filters: [Filter], pagination: Pagination, sortings: [Sorting]): RoleList
-  role(name: String!): Role
+  roles(filters: [Filter], pagination: Pagination, sortings: [Sorting]): RoleList @priviledge(category: "role", priviledge: "query")
+  role(name: String!): Role @priviledge(category: "role", priviledge: "query")
 `
 
 export const Types = [Role, NewRole, RolePatch, RoleList]
