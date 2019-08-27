@@ -7,9 +7,7 @@ export const directivePriviledge = {
       return next()
     }
 
-    const connection = getRepository(User).metadata.connection
-    const em = new EntityManager(connection)
-    const priviledges = await em.query(
+    const priviledges = await getRepository(User).query(
       `
         SELECT 
           name,

@@ -5,7 +5,7 @@ import { Role, User } from '../../../entities'
 export const createUser = {
   async createUser(_: any, { user }, context: any) {
     if (user.roles && user.roles.length) {
-      user.roles = await getRepository(Role).findByIds(user.roles)
+      user.roles = await getRepository(Role).findByIds(user.roles.map(role => role.id))
     }
 
     user.domain = await getRepository(Domain).findOne(user.domain.id)
