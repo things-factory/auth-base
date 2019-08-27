@@ -9,15 +9,10 @@ export const updateUser = {
       relations: ['domain', 'roles']
     })
 
-    patch.roles = await getRepository(Role).findByIds(patch.roles.map(role => role.id))
-    if (patch.roles.length === 0) {
-      delete patch.roles
-      delete user.roles
-    }
-
     return await repository.save({
       ...user,
       ...patch,
+      roles: await getRepository(Role).findByIds(patch.roles.map((role: Role) => role.id)),
       updater: context.state.user
     })
   }

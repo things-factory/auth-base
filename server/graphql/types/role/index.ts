@@ -24,7 +24,7 @@ export const Mutation = `
 `
 
 export const Query = `
-  userRoles: [UserRole] @priviledge(category: "role", priviledge: "query")
+  userRoles(userId: String!): [UserRole] @priviledge(category: "role", priviledge: "query")
   roles(filters: [Filter], pagination: Pagination, sortings: [Sorting]): RoleList @priviledge(category: "role", priviledge: "query")
   role(name: String!): Role @priviledge(category: "role", priviledge: "query")
 `
