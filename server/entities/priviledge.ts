@@ -13,7 +13,9 @@ import { Role } from './role'
 import { User } from './user'
 
 @Entity('priviledges')
-@Index('ix_priviledge_0', (priviledge: Priviledge) => [priviledge.domain, priviledge.name], { unique: true })
+@Index('ix_priviledge_0', (priviledge: Priviledge) => [priviledge.domain, priviledge.name, priviledge.category], {
+  unique: true
+})
 export class Priviledge {
   @PrimaryGeneratedColumn('uuid')
   id: String
