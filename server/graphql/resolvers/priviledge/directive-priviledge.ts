@@ -3,8 +3,9 @@ import { User } from '../../../entities'
 
 export const directivePriviledge = {
   async priviledge(next, root, args, context, info) {
-    console.log('priviledge ============================================')
-    console.log('required priviledge', context.state.user, args)
+    if (context.domain.systemFlag) {
+      return next()
+    }
 
     const connection = getRepository(User).metadata.connection
     const em = new EntityManager(connection)
@@ -34,19 +35,9 @@ export const directivePriviledge = {
 
     const priviledgeNames = priviledges.map(priviledge => priviledge.name)
     if (priviledgeNames.includes(args.priviledge)) {
-      next()
+      return next()
     } else {
       throw new Error(`Unauthorized!`)
     }
-
-    //create logic to compare with priviledge
-
-    console.log('priviledge ============================================')
-
-    // if (context.currentUser.role !== role) {
-    // throw new Error(`Unauthorized!`)
-    // }
-
-    return next()
   }
 }
