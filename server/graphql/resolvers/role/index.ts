@@ -1,5 +1,6 @@
 import { roleResolver } from './role'
 import { rolesResolver } from './roles'
+import { userRolesResolver } from './user-roles'
 
 import { updateRole } from './update-role'
 import { createRole } from './create-role'
@@ -8,7 +9,8 @@ import { deleteRoles } from './delete-roles'
 
 export const Query = {
   ...rolesResolver,
-  ...roleResolver
+  ...roleResolver,
+  ...userRolesResolver
 }
 
 export const Mutation = {

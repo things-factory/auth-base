@@ -1,5 +1,6 @@
 import { NewRole } from './new-role'
 import { Role } from './role'
+import { UserRole } from './user-role'
 import { RoleList } from './role-list'
 import { RolePatch } from './role-patch'
 
@@ -23,8 +24,9 @@ export const Mutation = `
 `
 
 export const Query = `
+  userRoles: [UserRole] @priviledge(category: "role", priviledge: "query")
   roles(filters: [Filter], pagination: Pagination, sortings: [Sorting]): RoleList @priviledge(category: "role", priviledge: "query")
   role(name: String!): Role @priviledge(category: "role", priviledge: "query")
 `
 
-export const Types = [Role, NewRole, RolePatch, RoleList]
+export const Types = [Role, UserRole, NewRole, RolePatch, RoleList]

@@ -3,7 +3,7 @@ import { User } from '../../../entities'
 
 export const directivePriviledge = {
   async priviledge(next, root, args, context, info) {
-    if (context.domain.systemFlag) {
+    if (context && context.domain && context.domain.systemFlag) {
       return next()
     }
 
