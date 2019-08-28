@@ -18,7 +18,7 @@ export const directivePriviledge = {
           id
         IN (
           SELECT
-            DISTINCT RP.priviledges_id
+            RP.priviledges_id
           FROM
             users_roles UR
           INNER JOIN
@@ -26,10 +26,9 @@ export const directivePriviledge = {
           ON
             UR.roles_id = RP.roles_id
           WHERE
-            UR.users_id = $1
+            UR.users_id = '${context.state.user.id}'
         )
-      `,
-      [context.state.user.id]
+      `
     )
 
     const assignPriviledge = priviledges.map(priviledge => {
