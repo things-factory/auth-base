@@ -5,6 +5,7 @@ export const UserPatch = gql`
     id: String
     name: String
     domain: ObjectRef
+    domains: [ObjectRef]
     description: String
     email: String
     password: String

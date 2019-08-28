@@ -4,6 +4,7 @@ export const NewUser = gql`
   input NewUser {
     name: String!
     domain: ObjectRef
+    domains: [ObjectRef]
     description: String
     email: String!
     password: String

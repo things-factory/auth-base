@@ -5,10 +5,11 @@ import { User } from '../../../entities'
 export const usersResolver = {
   async users(_: any, params: ListParam, context: any) {
     const queryBuilder = getRepository(User).createQueryBuilder()
-    buildQuery(queryBuilder, params, context, context && context.domain && !context.domain.systemFlag)
+    buildQuery(queryBuilder, params, context)
     const [items, total] = await queryBuilder
       .leftJoinAndSelect('User.roles', 'Roles')
       .leftJoinAndSelect('User.domain', 'Domain')
+      .leftJoinAndSelect('User.domains', 'Domains')
       .leftJoinAndSelect('Roles.priviledges', 'Priviledges')
       .leftJoinAndSelect('Roles.users', 'Users')
       .getManyAndCount()

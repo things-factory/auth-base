@@ -6,7 +6,7 @@ export const updateUser = {
     const repository = getRepository(User)
     const user = await repository.findOne({
       where: { email },
-      relations: ['domain', 'roles']
+      relations: ['domain', 'domains', 'roles']
     })
 
     return await repository.save({

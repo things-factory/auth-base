@@ -10,6 +10,7 @@ export const User = gql`
     roles: [Role]
     userType: String
     domain: Domain
+    domains: [Domain]
     creator: User
     updater: User
     createdAt: String

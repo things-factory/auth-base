@@ -35,6 +35,10 @@ export class User {
   @ManyToOne(type => Domain)
   domain: Domain
 
+  @ManyToMany(type => Domain)
+  @JoinTable({ name: 'users_domains' })
+  domains: Domain[]
+
   @Column()
   email: string
 
