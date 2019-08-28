@@ -18,7 +18,7 @@ export const userRolesResolver = {
             ON
               R.id = UR.roles_id
             WHERE
-              UR.users_id = :userId
+              UR.users_id = $userId
           ) THEN true
             ELSE false
           END AS assigned
