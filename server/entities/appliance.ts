@@ -8,7 +8,7 @@ import { User } from './user'
 })
 export class Appliance {
   @PrimaryGeneratedColumn('uuid')
-  id: number
+  id: string
 
   @ManyToOne(type => Domain)
   domain: Domain

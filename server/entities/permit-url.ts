@@ -6,7 +6,7 @@ import { User } from './user'
 @Index('ix_permit_url_0', (permitUrl: PermitUrl) => [permitUrl.domain, permitUrl.name], { unique: true })
 export class PermitUrl {
   @PrimaryGeneratedColumn('uuid')
-  id: number
+  id: string
 
   @ManyToOne(type => Domain)
   domain: Domain

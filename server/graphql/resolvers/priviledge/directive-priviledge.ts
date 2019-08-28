@@ -26,7 +26,7 @@ export const directivePriviledge = {
           ON
             UR.roles_id = RP.roles_id
           WHERE
-            UR.users_id = $id
+            UR.users_id = $1
         )
       `,
       [context.state.user.id]

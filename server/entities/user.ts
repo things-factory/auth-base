@@ -22,7 +22,7 @@ const SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
 @Index('ix_user_0', (user: User) => [user.domain, user.email], { unique: true })
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: number
+  id: string
 
   @Column()
   name: string
