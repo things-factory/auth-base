@@ -6,7 +6,7 @@ import { User } from './user'
 @Index('ix_user_histories_0', (userHistory: UserHistory) => [userHistory.domain, userHistory.id], { unique: true })
 export class UserHistory {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id: number
 
   @ManyToOne(type => Domain)
   domain: Domain

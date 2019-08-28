@@ -20,7 +20,7 @@ export const updateRole = {
 
     const priviledgeIds = role.priviledges.map(priviledge => priviledge.id)
     if (patch.priviledges && patch.priviledges.length) {
-      patch.priviledges.forEach((priviledgeId: string) => {
+      patch.priviledges.forEach((priviledgeId: number) => {
         if (!priviledgeIds.includes(priviledgeId)) {
           priviledgeIds.push(priviledgeId)
         }

@@ -18,7 +18,7 @@ import { User } from './user'
 })
 export class Priviledge {
   @PrimaryGeneratedColumn('uuid')
-  id: String
+  id: number
 
   @ManyToOne(type => Domain)
   domain: Domain

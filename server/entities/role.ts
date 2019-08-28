@@ -17,7 +17,7 @@ import { User } from './user'
 @Index('ix_role_0', (role: Role) => [role.domain, role.name], { unique: true })
 export class Role {
   @PrimaryGeneratedColumn('uuid')
-  id: String
+  id: number
 
   @ManyToOne(type => Domain)
   domain: Domain
