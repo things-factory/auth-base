@@ -11,5 +11,6 @@ export const UserPatch = gql`
     password: String
     roles: [ObjectRef]
     userType: String
+    cuFlag: String
   }
 `

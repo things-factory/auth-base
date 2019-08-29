@@ -1,5 +1,4 @@
-import { buildQuery, ListParam } from '@things-factory/shell'
-import { getRepository, EntityManager } from 'typeorm'
+import { getRepository } from 'typeorm'
 import { Role } from '../../../entities'
 
 export const userRolesResolver = {
@@ -18,14 +17,13 @@ export const userRolesResolver = {
             ON
               R.id = UR.roles_id
             WHERE
-              UR.users_id = $1
+              UR.users_id = '${userId}'
           ) THEN true
             ELSE false
           END AS assigned
         FROM
           roles
-      `,
-      [userId]
+      `
     )
 
     return userRoles

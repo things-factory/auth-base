@@ -1,4 +1,4 @@
-import { EntityManager, getRepository } from 'typeorm'
+import { getRepository } from 'typeorm'
 import { User } from '../../../entities'
 
 export const directivePriviledge = {
