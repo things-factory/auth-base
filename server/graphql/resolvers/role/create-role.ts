@@ -5,11 +5,11 @@ import { Domain } from '@things-factory/shell'
 export const createRole = {
   async createRole(_: any, { role }, context: any) {
     if (role.priviledges && role.priviledges.length) {
-      role.priviledges = await getRepository(Priviledge).findByIds(role.priviledges)
+      role.priviledges = await getRepository(Priviledge).findByIds(role.priviledges.map(priviledge => priviledge.id))
     }
 
     if (role.users && role.users.length) {
-      role.users = await getRepository(User).findByIds(role.users)
+      role.users = await getRepository(User).findByIds(role.users.map(user => user.id))
     }
 
     role.domain = await getRepository(Domain).findOne(role.domain.id)

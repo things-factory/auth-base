@@ -7,26 +7,26 @@ import { RolePatch } from './role-patch'
 export const Mutation = `
   createRole (
     role: NewRole!
-  ): Role @priviledge(category: "role", priviledge: "mutation")
+  ): Role @priviledge(category: "user", priviledge: "mutation")
 
   updateRole (
     name: String!
     patch: RolePatch!
-  ): Role @priviledge(category: "role", priviledge: "mutation")
+  ): Role @priviledge(category: "user", priviledge: "mutation")
 
   deleteRole (
     name: String!
-  ): Boolean @priviledge(category: "role", priviledge: "mutation")
+  ): Boolean @priviledge(category: "user", priviledge: "mutation")
 
   deleteRoles (
     names: [String]!
-  ): Boolean @priviledge(category: "role", priviledge: "mutation")
+  ): Boolean @priviledge(category: "user", priviledge: "mutation")
 `
 
 export const Query = `
-  userRoles(userId: String!): [UserRole] @priviledge(category: "role", priviledge: "query")
-  roles(filters: [Filter], pagination: Pagination, sortings: [Sorting]): RoleList @priviledge(category: "role", priviledge: "query")
-  role(name: String!): Role @priviledge(category: "role", priviledge: "query")
+  userRoles(userId: String!): [UserRole] @priviledge(category: "user", priviledge: "query")
+  roles(filters: [Filter], pagination: Pagination, sortings: [Sorting]): RoleList @priviledge(category: "user", priviledge: "query")
+  role(name: String!): Role @priviledge(category: "user", priviledge: "query")
 `
 
 export const Types = [Role, UserRole, NewRole, RolePatch, RoleList]
