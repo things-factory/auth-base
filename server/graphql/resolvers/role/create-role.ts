@@ -12,14 +12,12 @@ export const createRole = {
       role.users = await getRepository(User).findByIds(role.users)
     }
 
-    var domain = await getRepository(Domain).findOne(role.domain.id)
+    role.domain = await getRepository(Domain).findOne(role.domain.id)
 
     return await getRepository(Role).save({
-      // domain: context.domain,
       updater: context.state.user,
       creator: context.state.user,
-      ...role,
-      domain
+      ...role
     })
   }
 }
