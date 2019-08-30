@@ -16,6 +16,10 @@ export const Mutation = `
   deleteUser (
     email: String!
   ): Boolean @priviledge(category: "user", priviledge: "mutation")
+
+  deleteUsers (
+    emails: [String]!
+  ): Boolean @priviledge(category: "user", priviledge: "mutation")
 `
 
 export const Query = `
