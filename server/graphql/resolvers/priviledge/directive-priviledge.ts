@@ -7,14 +7,17 @@ export const directivePriviledge = {
       return next()
     }
 
-    const priviledges = await getRepository(User).query(
+    const result = await getRepository(User).query(
       `
         SELECT 
-          name,
-          category
+          COUNT(1) AS hasPriviledge
         FROM
           priviledges
         WHERE
+          category = '${args.category}'
+        AND
+          name = '${args.priviledge}'
+        AND
           id
         IN (
           SELECT
@@ -31,10 +34,7 @@ export const directivePriviledge = {
       `
     )
 
-    const assignPriviledge = priviledges.map(priviledge => {
-      return `${priviledge.category}-${priviledge.name}`
-    })
-    if (assignPriviledge.includes(`${args.category}-${args.priviledge}`)) {
+    if (result[0].hasPriviledge > 0) {
       return next()
     } else {
       throw new Error(`Unauthorized!`)
