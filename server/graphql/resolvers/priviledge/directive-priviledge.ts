@@ -10,7 +10,7 @@ export const directivePriviledge = {
     const result = await getRepository(User).query(
       `
         SELECT 
-          COUNT(1) AS hasPriviledge
+          COUNT(1) AS has_priviledge
         FROM
           priviledges
         WHERE
@@ -34,7 +34,7 @@ export const directivePriviledge = {
       `
     )
 
-    if (result[0].hasPriviledge > 0) {
+    if (result[0].has_priviledge > 0) {
       return next()
     } else {
       throw new Error(`Unauthorized!`)
