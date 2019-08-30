@@ -21,7 +21,9 @@ export const updateRole = {
     return await repository.save({
       ...role,
       ...patch,
-      priviledges: await getRepository(Priviledge).findByIds(priviledgeIds),
+      priviledges: await getRepository(Priviledge).findByIds(
+        patch.priviledges.map((priviledge: Priviledge) => priviledge.id)
+      ),
       updater: context.state.user
     })
   }
