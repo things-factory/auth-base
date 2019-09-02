@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm'
 import { Priviledge } from '../../../entities'
 
 export const rolePriviledgesResolver = {
-  async rolePriviledges(_: any, { roleId }) {
+  async rolePriviledges(_: any, { roleId }, context: any) {
     const rolePriviledges = await getRepository(Priviledge).query(
       `
         SELECT
@@ -24,6 +24,8 @@ export const rolePriviledgesResolver = {
           END AS assigned
         FROM
           priviledges
+        WHERE
+            domain_id = '${context.domain.id}'
       `
     )
 
