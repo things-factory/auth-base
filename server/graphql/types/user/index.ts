@@ -13,6 +13,10 @@ export const Mutation = `
     patch: UserPatch!
   ): User @priviledge(category: "user", priviledge: "mutation")
 
+  updateMultipleUser (
+    patches: [UserPatch]!
+  ): [User]
+  
   deleteUser (
     email: String!
   ): Boolean @priviledge(category: "user", priviledge: "mutation")
