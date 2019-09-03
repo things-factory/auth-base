@@ -3,7 +3,7 @@ import { Priviledge } from '../../../entities'
 
 export const deletePriviledge = {
   async deletePriviledge(_: any, { name }, context: any) {
-    await getRepository(Priviledge).delete({ domain: context.domain, name })
+    await getRepository(Priviledge).delete({ domain: context.state.domain, name })
     return true
   }
 }

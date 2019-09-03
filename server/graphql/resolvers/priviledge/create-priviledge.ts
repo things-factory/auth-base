@@ -8,7 +8,7 @@ export const createPriviledge = {
     }
 
     return await getRepository(Priviledge).save({
-      domain: context.domain,
+      domain: context.state.domain,
       creator: context.state.user,
       updater: context.state.user,
       ...priviledge

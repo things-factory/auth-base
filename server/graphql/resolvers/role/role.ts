@@ -4,7 +4,7 @@ import { Role } from '../../../entities'
 export const roleResolver = {
   async role(_: any, { name }, context: any) {
     return await getRepository(Role).findOne({
-      where: { domain: context.domain, name },
+      where: { domain: context.state.domain, name },
       relations: ['domain', 'users', 'priviledges', 'creator', 'updater']
     })
   }

@@ -4,7 +4,7 @@ import { Appliance } from '../../../entities'
 export const updateAppliance = {
   async updateAppliance(_: any, { name, patch }, context: any) {
     const repository = getRepository(Appliance)
-    const appliance = await repository.findOne({ where: { domain: context.domain, name } })
+    const appliance = await repository.findOne({ where: { domain: context.state.domain, name } })
 
     return await repository.save({
       ...appliance,

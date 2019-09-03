@@ -25,7 +25,7 @@ export const rolePriviledgesResolver = {
         FROM
           priviledges
         WHERE
-            domain_id = '${context.domain.id}'
+            domain_id = '${context.state.domain.id}'
       `
     )
 

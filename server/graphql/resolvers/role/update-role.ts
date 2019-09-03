@@ -5,7 +5,7 @@ export const updateRole = {
   async updateRole(_: any, { name, patch }, context: any) {
     const repository = getRepository(Role)
     const role = await repository.findOne({
-      where: { domain: context.domain, name },
+      where: { domain: context.state.domain, name },
       relations: ['domain', 'priviledges', 'creator', 'updater']
     })
 
