@@ -60,6 +60,23 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     }
   })
 
+  routes.post('/signout', koaBodyParser(bodyParserOption), async (context, next) => {
+    try {
+      context.body = {
+        message: 'signout successfully'
+      }
+
+      context.cookies.set('access_token', '', {
+        httpOnly: true
+      })
+    } catch (e) {
+      context.status = 401
+      context.body = {
+        message: e.message
+      }
+    }
+  })
+
   routes.get('/authcheck', async (context, next) => {
     try {
       // 새로운 토큰 발급
