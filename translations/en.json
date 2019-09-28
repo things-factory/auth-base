@@ -2,7 +2,7 @@
   "field.email": "email address",
   "field.password": "password",
   "field.token": "token",
-  "field.appliance_id": "appliance_id",
+  "field.appliance_id": "appliance id",
   "field.brand": "brand",
   "field.model": "model",
   "field.active": "active",
@@ -10,5 +10,6 @@
   "field.roles": "roles",
   "field.priviledges": "priviledges",
   "field.user": "user",
-  "field.user_account": "user_account"
+  "field.user_type": "user type",
+  "field.user_account": "user account"
 }

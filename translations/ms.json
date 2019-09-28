@@ -10,5 +10,6 @@
   "field.roles": "peranan",
   "field.priviledges": "keistimewaan",
   "field.user": "pengguna",
+  "field.user_type": "user type",
   "field.user_account": "akaun pengguna"
 }

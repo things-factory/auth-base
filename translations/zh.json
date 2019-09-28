@@ -1,5 +1,15 @@
 {
   "field.email": "电子邮件地址",
   "field.password": "密码",
-  "field.token": "符记"
+  "field.token": "符记",
+  "field.appliance_id": "appliance_id",
+  "field.brand": "brand",
+  "field.model": "model",
+  "field.active": "active",
+  "field.category": "category",
+  "field.roles": "roles",
+  "field.priviledges": "priviledges",
+  "field.user": "user",
+  "field.user_type": "user type",
+  "field.user_account": "user_account"
 }

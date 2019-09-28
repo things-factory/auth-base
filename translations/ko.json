@@ -2,7 +2,7 @@
   "field.email": "이메일",
   "field.password": "패스워드",
   "field.token": "토큰",
-  "field.appliance_id": "",
+  "field.appliance_id": "기구 아이디",
   "field.brand": "브랜드",
   "field.model": "모델",
   "field.active": "활성화",
@@ -10,5 +10,6 @@
   "field.roles": "규칙",
   "field.priviledges": "권한",
   "field.user": "사용자",
+  "field.user_type": "사용자 유형",
   "field.user_account": "사용자 계정"
 }
