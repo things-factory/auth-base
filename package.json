@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-base",
-  "version": "0.2.0",
+  "version": "0.9.0",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -23,7 +23,7 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
-    "@things-factory/shell": "*",
+    "@things-factory/shell": "^0.9.0",
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
