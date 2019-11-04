@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-base",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -27,6 +27,6 @@
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
-    "@things-factory/tester": "*"
+    "@things-factory/tester": "^1.0.0-alpha.1"
   }
 }
