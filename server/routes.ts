@@ -2,6 +2,8 @@ import koaBodyParser from 'koa-bodyparser'
 
 import { signup, signin, authcheck, changePwd } from './controllers/auth'
 
+import { getPathInfo } from '@things-factory/shell'
+
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
@@ -79,8 +81,17 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
   routes.get('/authcheck', async (context, next) => {
     try {
+      var { request } = context
+      var { origin, header } = request
+      var { referer } = header
+      var pathname = referer.replace(origin, '')
+      var { domain } = getPathInfo(pathname)
+
       // 새로운 토큰 발급
-      var token = await authcheck(context.state.user.email)
+      var { token, domains } = await authcheck({
+        id: context.state.user.id,
+        domain
+      })
 
       context.cookies.set('access_token', token, {
         httpOnly: true,
@@ -90,12 +101,14 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       context.body = {
         message: 'token checked successfully',
         token,
+        domains,
         user: context.state.user // jwt-koa or authMiddleware will set context.state.token, user
       }
     } catch (e) {
       context.status = 401
       context.body = {
-        message: e.message
+        message: e.message,
+        domains: domains || []
       }
     }
   })

@@ -39,15 +39,36 @@ export async function signin(attrs) {
   return await user.sign()
 }
 
-export async function authcheck(email) {
+export async function authcheck({ id, domain }) {
   const repository = getRepository(User)
-  const user = await repository.findOne({ where: { email }, relations: ['domain'] })
+  const user = await repository.findOne({ where: { id }, relations: ['domains'] })
 
+  // id와 일치하는 유저가 있는지 체크\
   if (!user) {
     throw new Error('user not found.')
   }
 
-  return await user.sign()
+  // 유저가 접속할 수 있는 도메인이 존재하는지 확인
+  if (!user.domains || !user.domains.length) {
+    throw new Error('domain not found.')
+  }
+
+  var token = await user.sign()
+  var domains = user.domains
+
+  // 접속한 URL과 일치하는 도메인이 존재하는지 확인
+  if (domain) {
+    var foundDomain = domains.find(d => d.subdomain == domain)
+
+    if (!foundDomain) {
+      throw new Error('domain is not available to user.')
+    }
+  }
+
+  return {
+    token,
+    domains
+  }
 }
 
 export async function changePwd(attrs, newPass) {

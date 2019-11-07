@@ -77,8 +77,7 @@ export class User {
     var user = {
       id: this.id,
       email: this.email,
-      userType: this.userType,
-      domain: this.domain
+      userType: this.userType
     }
 
     return await jwt.sign(user, SECRET, {
@@ -112,7 +111,7 @@ export class User {
 
     const repository = getRepository(User)
     var user = await repository.findOne({
-      email: decoded.email
+      id: decoded.id
     })
 
     if (!user) {
