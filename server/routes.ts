@@ -7,7 +7,7 @@ import { getPathInfo } from '@things-factory/shell'
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  fallbackOption.whiteList.push('/authcheck')
+  fallbackOption.whiteList.push(`^\/(${['authcheck'].join('|')})($|[/?#])`)
 })
 
 process.on('bootstrap-module-route' as any, (app, routes) => {
