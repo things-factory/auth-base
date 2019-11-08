@@ -1,23 +1,31 @@
 import { store } from '@things-factory/shell'
+import { updateAuthenticated, updateUser, updateDomains } from './actions/auth'
 import { auth } from './auth'
 import reducerAuth from './reducers/auth'
-import { updateAuthenticated, updateUser } from './actions/auth'
 
 export default function bootstrap() {
   store.addReducers({
     auth: reducerAuth
   })
 
-  auth.on('signin', accessToken => {
+  auth.on('signin', ({ accessToken, domains }) => {
     store.dispatch(updateAuthenticated(true))
+    store.dispatch(updateDomains(domains))
   })
 
   auth.on('signout', () => {
     store.dispatch(updateAuthenticated(false))
+    store.dispatch(updateDomains([]))
   })
 
-  auth.on('profile', profile => {
-    store.dispatch(updateUser(profile))
+  auth.on('profile', ({ credential, domains }) => {
+    store.dispatch(updateUser(credential))
+    store.dispatch(updateDomains(domains))
+  })
+
+  auth.on('domain-not-available', ({ credential, domains }) => {
+    store.dispatch(updateUser(credential))
+    store.dispatch(updateDomains(domains))
   })
 
   auth.on('changePassword', result => {

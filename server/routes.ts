@@ -43,11 +43,12 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   routes.post('/signin', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
       let user = context.request.body
-      let token = await signin(user)
+      let { token, domains } = await signin(user)
 
       context.body = {
         message: 'signin successfully',
-        token
+        token,
+        domains
       }
 
       context.cookies.set('access_token', token, {
@@ -105,10 +106,22 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         user: context.state.user // jwt-koa or authMiddleware will set context.state.token, user
       }
     } catch (e) {
-      context.status = 401
+      var status = 401
+
+      var body = {}
+      if (e.name == 'DomainNotAvailable') {
+        status = 406
+        body = {
+          domains: e.domains,
+          user: context.state.user
+        }
+      }
+
+      context.status = status
       context.body = {
         message: e.message,
-        domains: domains || []
+        domains: domains || [],
+        ...body
       }
     }
   })

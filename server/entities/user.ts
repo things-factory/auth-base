@@ -77,7 +77,8 @@ export class User {
     var user = {
       id: this.id,
       email: this.email,
-      userType: this.userType
+      userType: this.userType,
+      domain: this.domain
     }
 
     return await jwt.sign(user, SECRET, {
@@ -110,9 +111,7 @@ export class User {
     var decoded = await jwt.verify(token, SECRET)
 
     const repository = getRepository(User)
-    var user = await repository.findOne({
-      id: decoded.id
-    })
+    var user = await repository.findOne(decoded.id)
 
     if (!user) {
       throw new Error('user notfound.')

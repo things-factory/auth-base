@@ -1,6 +1,8 @@
 const DEFAULT_AUTH_REQUIRED_EVENT = 'auth-required'
+const DEFAULT_DOMAIN_NOT_AVAILABLE_EVENT = 'domain-not-available'
 const DEFAULT_ROUTE_PAGE = ''
 const DEFAULT_CONTEXT_PATH = ''
+const DEFAULT_DOMAIN_SELECT_PAGE = 'domain-select'
 
 const NOOP = () => {}
 
@@ -22,6 +24,7 @@ class ClientAuth {
     defaultRoutePage = DEFAULT_ROUTE_PAGE,
     contextPath = DEFAULT_CONTEXT_PATH,
     authRequiredEvent = DEFAULT_AUTH_REQUIRED_EVENT,
+    domainNotAvailableEvent = DEFAULT_DOMAIN_NOT_AVAILABLE_EVENT,
     signupPath = 'signup',
     signinPath = 'signin',
     profilePath = 'authcheck',
@@ -29,6 +32,7 @@ class ClientAuth {
     signupPage = 'signup',
     changepassPath = 'change_pass',
     signoutPage,
+    domainSelectPage = DEFAULT_DOMAIN_SELECT_PAGE,
     endpoint = ''
   }) {
     this._event_listeners = {
@@ -36,7 +40,8 @@ class ClientAuth {
       signout: [],
       profile: [],
       changePassword: [],
-      error: []
+      error: [],
+      'domain-not-available': []
     }
 
     this.endpoint = endpoint
@@ -45,6 +50,7 @@ class ClientAuth {
     this.defaultRoutePage = defaultRoutePage
     this.contextPath = contextPath
     this.authRequiredEvent = authRequiredEvent
+    this.domainNotAvailableEvent = domainNotAvailableEvent
 
     this.signupPath = signupPath
     this.signinPath = signinPath
@@ -53,6 +59,7 @@ class ClientAuth {
     this.signinPage = signinPage
     this.signupPage = signupPage
     this.signoutPage = signoutPage
+    this.domainSelectPage = domainSelectPage
     this.changepassPath = changepassPath
   }
 
@@ -99,7 +106,7 @@ class ClientAuth {
   fullpage(relativePath) {
     return (
       '/' +
-      [this.contextPath, relativePath]
+      [relativePath]
         .filter(path => path && path !== '/')
         .map(path => (path.startsWith('/') ? path.substr(1) : path))
         .map(path => (path.endsWith('/') ? path.substr(0, path.length - 1) : path))
@@ -134,10 +141,26 @@ class ClientAuth {
     this.authRequiredEvent && document.addEventListener(this.authRequiredEvent, this._authRequiredEventListener)
   }
 
-  onSignedIn(accessToken) {
-    this.accessToken = accessToken
+  get domainNotAvailableEvent() {
+    return this._domainNotAvailableEvent
+  }
 
-    this._event_listeners.signin.forEach(handler => handler(accessToken))
+  set domainNotAvailableEvent(domainNotAvailableEvent) {
+    this._domainNotAvailableEventListener &&
+      document.removeEventListener(this.domainNotAvailableEvent, this._domainNotAvailableEventListener)
+
+    this._domainNotAvailableEvent = domainNotAvailableEvent
+
+    this._domainNotAvailableEventListener = this.onDomainNotAvailable.bind(this)
+    this.domainNotAvailableEvent &&
+      document.addEventListener(this.domainNotAvailableEvent, this._domainNotAvailableEventListener)
+  }
+
+  onSignedIn({ accessToken, domains }) {
+    this.accessToken = accessToken
+    this.domains = domains
+
+    this._event_listeners.signin.forEach(handler => handler({ accessToken, domains }))
 
     let state = window.history.state
 
@@ -156,22 +179,24 @@ class ClientAuth {
     }
   }
 
-  onProfileFetched(credential, accessToken) {
+  onProfileFetched({ credential, accessToken, domains }) {
     this.credential = credential
+    this.domains = domains
     if (accessToken && !this.accessToken) {
-      /* 
+      /*
       기존에 세션을 가지거나, 액세스토큰으로 인증된 경우,
       이 경우는 signin 이벤트리스너들을 호출해서 authenticated 상태로 되도록 유도한다.
       */
       this.accessToken = accessToken
-      this._event_listeners.signin.forEach(handler => handler(accessToken))
+      this._event_listeners.signin.forEach(handler => handler({ accessToken, domains }))
     }
     accessToken && (this.accessToken = accessToken)
-    this._event_listeners.profile.forEach(handler => handler(credential))
+    this._event_listeners.profile.forEach(handler => handler({ credential, domains }))
   }
 
   onSignedOut() {
     this.credential = null
+    this.domains = []
     this._event_listeners.signout.forEach(handler => handler())
 
     this.route(this.fullpage(this.signoutPage ? this.signoutPage : this.signinPage), false)
@@ -195,6 +220,12 @@ class ClientAuth {
   onAuthRequired(e) {
     console.warn('authentication required')
     this.route(this.fullpage(this.signinPage), true)
+  }
+
+  onDomainNotAvailable(e) {
+    console.warn('domain not available')
+    this._event_listeners['domain-not-available'].forEach(handler => handler(e))
+    this.route(this.fullpage(this.domainSelectPage))
   }
 
   route(path, redirected) {

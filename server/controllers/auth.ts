@@ -1,5 +1,6 @@
 import { getRepository } from 'typeorm'
 import { User } from '../entities'
+import { DomainNotAvailableException } from '../exception/domain-not-available-exception'
 
 export async function signup(attrs) {
   const repository = getRepository(User)
@@ -26,7 +27,7 @@ export async function signup(attrs) {
 export async function signin(attrs) {
   const repository = getRepository(User)
 
-  const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain'] })
+  const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain', 'domains'] })
 
   if (!user) {
     throw new Error('user not found.')
@@ -36,12 +37,15 @@ export async function signin(attrs) {
     throw new Error('password not match.')
   }
 
-  return await user.sign()
+  return {
+    token: await user.sign(),
+    domains: user.domains || []
+  }
 }
 
 export async function authcheck({ id, domain }) {
   const repository = getRepository(User)
-  const user = await repository.findOne({ where: { id }, relations: ['domains'] })
+  const user = await repository.findOne({ where: { id }, relations: ['domain', 'domains'] })
 
   // id와 일치하는 유저가 있는지 체크\
   if (!user) {
@@ -61,7 +65,10 @@ export async function authcheck({ id, domain }) {
     var foundDomain = domains.find(d => d.subdomain == domain)
 
     if (!foundDomain) {
-      throw new Error('domain is not available to user.')
+      throw new DomainNotAvailableException({
+        message: 'domain is not available to user.',
+        domains: domains
+      })
     }
   }
 
