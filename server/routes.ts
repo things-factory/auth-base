@@ -3,6 +3,7 @@ import koaBodyParser from 'koa-bodyparser'
 import { signup, signin, authcheck, changePwd } from './controllers/auth'
 
 import { getPathInfo } from '@things-factory/shell'
+import { User } from './entities'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
@@ -98,6 +99,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         httpOnly: true,
         maxAge: MAX_AGE
       })
+
+      context.state.user = await User.check(token)
 
       context.body = {
         message: 'token checked successfully',
