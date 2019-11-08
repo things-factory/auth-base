@@ -69,6 +69,9 @@ export async function authcheck({ id, domain }) {
         message: 'domain is not available to user.',
         domains: domains
       })
+    } else {
+      user.domain = foundDomain
+      await repository.save(user)
     }
   }
 
