@@ -8,7 +8,9 @@ import { User } from './entities'
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  fallbackOption.whiteList.push(`^\/(${['authcheck'].join('|')})($|[/?#])`)
+  var paths = ['authcheck']
+
+  fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
 })
 
 process.on('bootstrap-module-route' as any, (app, routes) => {
