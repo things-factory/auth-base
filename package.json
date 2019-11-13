@@ -27,6 +27,7 @@
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
-    "@things-factory/tester": "^1.0.0-alpha.1"
+    "@things-factory/board-app": "^1.0.0-alpha.7",
+    "@things-factory/board-test": "^1.0.0-alpha.3"
   }
 }

@@ -4,6 +4,7 @@ import { signup, signin, authcheck, changePwd } from './controllers/auth'
 
 import { getPathInfo } from '@things-factory/shell'
 import { User } from './entities'
+import { URL } from 'url'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
@@ -86,9 +87,9 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   routes.get('/authcheck', async (context, next) => {
     try {
       var { request } = context
-      var { origin, header } = request
+      var { header } = request
       var { referer } = header
-      var pathname = referer.replace(origin, '')
+      var { pathname } = new URL(referer)
       var { domain } = getPathInfo(pathname)
 
       // 새로운 토큰 발급

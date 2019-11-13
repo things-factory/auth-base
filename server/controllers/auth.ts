@@ -57,7 +57,6 @@ export async function authcheck({ id, domain }) {
     throw new Error('domain not found.')
   }
 
-  var token = await user.sign()
   var domains = user.domains
 
   // 접속한 URL과 일치하는 도메인이 존재하는지 확인
@@ -74,6 +73,8 @@ export async function authcheck({ id, domain }) {
       await repository.save(user)
     }
   }
+
+  var token = await user.sign()
 
   return {
     token,
