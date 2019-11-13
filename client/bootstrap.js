@@ -1,5 +1,5 @@
-import { store, getPathInfo, makeContextPath } from '@things-factory/shell'
-import { updateAuthenticated, updateUser, updateDomains } from './actions/auth'
+import { store, getPathInfo, makeContextPath, updateDomains } from '@things-factory/shell'
+import { updateAuthenticated, updateUser } from './actions/auth'
 import { auth } from './auth'
 import reducerAuth from './reducers/auth'
 

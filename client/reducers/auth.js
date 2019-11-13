@@ -4,7 +4,6 @@ const INITIAL_STATE = {
   locale: 'en-US',
   authenticated: false,
   accessToken: '',
-  domains: [],
   user: null
 }
 
@@ -29,12 +28,6 @@ const auth = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         user: action.user
-      }
-
-    case SET_DOMAINS:
-      return {
-        ...state,
-        domains: action.domains
       }
 
     default:
