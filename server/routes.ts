@@ -1,15 +1,18 @@
-import koaBodyParser from 'koa-bodyparser'
-
-import { signup, signin, authcheck, changePwd } from './controllers/auth'
-
 import { getPathInfo } from '@things-factory/shell'
-import { User } from './entities'
+import koaBodyParser from 'koa-bodyparser'
 import { URL } from 'url'
+import { changePwd } from './controllers/change-pwd'
+import { signin } from './controllers/signin'
+import { signup } from './controllers/signup'
+import { authcheck } from './controllers/authcheck'
+import { verify, resendVerificationEmail } from './controllers/verification'
+import { User } from './entities'
+import { UserDomainNotMatchError } from './errors/user-domain-not-match-error'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  var paths = ['authcheck']
+  var paths = ['authcheck', 'verify', 'resend-verification-email']
 
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
 })
@@ -25,7 +28,13 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   routes.post('/signup', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
       let user = context.request.body
-      let token = await signup(user)
+      let { token } = await signup(
+        {
+          ...user,
+          context
+        },
+        true
+      )
 
       context.body = {
         message: 'registered successfully',
@@ -113,14 +122,19 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       }
     } catch (e) {
       var status = 401
-
       var body = {}
-      if (e.name == 'DomainNotAvailable') {
-        status = 406
-        body = {
-          domains: e.domains,
-          user: context.state.user
+      if (e.errorCode) {
+        body['errorCode'] = e.errorCode
+        if (e instanceof UserDomainNotMatchError) {
+          status = 406
+          body = {
+            ...body,
+            domains: e.domains,
+            user: context.state.user
+          }
         }
+      } else {
+        status = 500
       }
 
       context.status = status
@@ -146,6 +160,35 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         httpOnly: true,
         maxAge: MAX_AGE
       })
+    } catch (e) {
+      throw new Error(e)
+    }
+  })
+
+  routes.get('/verify/:token', async (context, next) => {
+    try {
+      var token = context.params.token
+      var isVerified = await verify(token)
+
+      if (isVerified) context.redirect('/')
+    } catch (e) {
+      throw new Error(e)
+    }
+  })
+
+  routes.get('/resend-verification-email', async (context, next) => {
+    try {
+      var { user } = context.state
+
+      if (!user) return next()
+
+      var { email } = user
+      var succeed = await resendVerificationEmail(email, context)
+
+      if (succeed) {
+        context.status = 200
+        context.body = 'verification email sent'
+      }
     } catch (e) {
       throw new Error(e)
     }

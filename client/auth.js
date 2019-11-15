@@ -1,4 +1,5 @@
 const DEFAULT_AUTH_REQUIRED_EVENT = 'auth-required'
+const DEFAULT_ACTIVATE_REQUIRED_EVENT = 'activate-required'
 const DEFAULT_DOMAIN_NOT_AVAILABLE_EVENT = 'domain-not-available'
 const DEFAULT_ROUTE_PAGE = ''
 const DEFAULT_CONTEXT_PATH = ''
@@ -24,10 +25,12 @@ class ClientAuth {
     defaultRoutePage = DEFAULT_ROUTE_PAGE,
     contextPath = DEFAULT_CONTEXT_PATH,
     authRequiredEvent = DEFAULT_AUTH_REQUIRED_EVENT,
+    activateRequiredEvent = DEFAULT_ACTIVATE_REQUIRED_EVENT,
     domainNotAvailableEvent = DEFAULT_DOMAIN_NOT_AVAILABLE_EVENT,
     signupPath = 'signup',
     signinPath = 'signin',
     profilePath = 'authcheck',
+    activatePage = 'activate',
     signinPage = 'signin',
     signupPage = 'signup',
     changepassPath = 'change_pass',
@@ -50,12 +53,14 @@ class ClientAuth {
     this.defaultRoutePage = defaultRoutePage
     this.contextPath = contextPath
     this.authRequiredEvent = authRequiredEvent
+    this.activateRequiredEvent = activateRequiredEvent
     this.domainNotAvailableEvent = domainNotAvailableEvent
 
     this.signupPath = signupPath
     this.signinPath = signinPath
     this.profilePath = profilePath
 
+    this.activatePage = activatePage
     this.signinPage = signinPage
     this.signupPage = signupPage
     this.signoutPage = signoutPage
@@ -84,6 +89,8 @@ class ClientAuth {
 
   dispose() {
     this.authRequiredEvent = null
+    this.activateRequiredEvent = null
+    this.domainNotAvailableEvent = null
     delete this._event_listeners
   }
 
@@ -139,6 +146,21 @@ class ClientAuth {
 
     this._authRequiredEventListener = this.onAuthRequired.bind(this)
     this.authRequiredEvent && document.addEventListener(this.authRequiredEvent, this._authRequiredEventListener)
+  }
+
+  get activateRequiredEvent() {
+    return this._activateRequiredEvent
+  }
+
+  set activateRequiredEvent(activateRequiredEvent) {
+    this._activateRequiredEventListener &&
+      document.removeEventListener(this.activateRequiredEvent, this._activateRequiredEventListener)
+
+    this._activateRequiredEvent = activateRequiredEvent
+
+    this._activateRequiredEventListener = this.onActivateRequired.bind(this)
+    this.activateRequiredEvent &&
+      document.addEventListener(this.activateRequiredEvent, this._activateRequiredEventListener)
   }
 
   get domainNotAvailableEvent() {
@@ -220,6 +242,11 @@ class ClientAuth {
   onAuthRequired(e) {
     console.warn('authentication required')
     this.route(this.fullpage(this.signinPage), true)
+  }
+
+  onActivateRequired(e) {
+    console.warn('activate required')
+    this.route(this.fullpage(this.activatePage), true)
   }
 
   onDomainNotAvailable(e) {

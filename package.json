@@ -23,6 +23,7 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
+    "@things-factory/email-base": "^1.0.0-alpha.1",
     "@things-factory/shell": "^1.0.0-alpha.1",
     "jsonwebtoken": "^8.5.1"
   },

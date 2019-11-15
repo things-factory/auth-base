@@ -61,6 +61,11 @@ export class User {
   })
   userType: string // default: 'user, enum: 'user', 'admin'
 
+  @Column({
+    nullable: true
+  })
+  activated: boolean
+
   @ManyToOne(type => User, {
     nullable: true
   })
