@@ -7,7 +7,8 @@ const SEED_USERS = [
     name: 'Admin',
     email: 'admin@hatiolab.com',
     password: 'admin',
-    userType: 'admin'
+    userType: 'admin',
+    activated: true
   }
 ]
 
