@@ -186,18 +186,16 @@ class ClientAuth {
 
     let state = window.history.state
 
-    if (!state || !('redirected' in state)) {
-      /* signin/signup page에 직접(주소창 입력, 링크) 들어온 경우 */
-      this.route(this.fullpage(this.defaultRoutePage), false)
+    var lastUrl = sessionStorage.getItem('lastUrl')
+
+    if (lastUrl) {
+      /* authRequired를 통해서 들어온 경우 */
+      sessionStorage.removeItem('lastUrl')
+      location.replace(lastUrl)
     } else {
-      /* 인증 프로세스를 통해서 들어온 경우 */
-      if (state.redirected) {
-        /* authRequired를 통해서 들어온 경우 */
-        window.history.back()
-      } else {
-        /* signout을 통해서 들어온 경우 */
-        this.route(this.fullpage(this.defaultRoutePage), false)
-      }
+      /* signin/signup page에 직접(주소창 입력, 링크) 들어온 경우 */
+      /* signout을 통해서 들어온 경우 */
+      this.route(this.fullpage(this.defaultRoutePage), false)
     }
   }
 
@@ -246,7 +244,7 @@ class ClientAuth {
 
   onActivateRequired(e) {
     console.warn('activate required')
-    this.route(this.fullpage(this.activatePage), true)
+    this.route(this.fullpage(this.activatePage), false)
   }
 
   onDomainNotAvailable(e) {
@@ -262,6 +260,11 @@ class ClientAuth {
     const href = `${origin}${path}`
 
     if (location.pathname === path) return
+
+    if (redirected) {
+      var lastUrl = sessionStorage.getItem('lastUrl')
+      if (!lastUrl) sessionStorage.setItem('lastUrl', location.href)
+    }
 
     // popstate 이벤트가 history.back() 에서만 발생하므로
     // 히스토리에 두번을 넣고 back()을 호출하는 편법을 사용함.
