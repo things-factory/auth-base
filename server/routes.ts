@@ -171,6 +171,10 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       var isVerified = await verify(token)
 
       if (isVerified) context.redirect('/')
+      else {
+        context.status = 404
+        context.body = 'User or verification token not found'
+      }
     } catch (e) {
       throw new Error(e)
     }

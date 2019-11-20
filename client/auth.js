@@ -184,8 +184,6 @@ class ClientAuth {
 
     this._event_listeners.signin.forEach(handler => handler({ accessToken, domains }))
 
-    let state = window.history.state
-
     var lastUrl = sessionStorage.getItem('lastUrl')
 
     if (lastUrl) {
@@ -261,7 +259,8 @@ class ClientAuth {
 
     if (location.pathname === path) return
 
-    if (redirected) {
+    // 현재 URL이 auth관련 page URL이 아니고, redirect된 경우
+    if (redirected && !this.isAuthPageUrl(location)) {
       var lastUrl = sessionStorage.getItem('lastUrl')
       if (!lastUrl) sessionStorage.setItem('lastUrl', location.href)
     }
@@ -275,6 +274,23 @@ class ClientAuth {
     window.history.pushState({}, '', href)
 
     window.history.back()
+  }
+
+  isAuthPageUrl(fullurl) {
+    var url = new URL(fullurl)
+    var { pathname } = url
+    var path = pathname.replace(/^\//, '')
+
+    switch (path) {
+      case this.signinPage:
+      case this.signupPage:
+      case this.signoutPage:
+      case this.activatePage:
+      case this.domainSelectPage:
+        return true
+      default:
+        return false
+    }
   }
 }
 
