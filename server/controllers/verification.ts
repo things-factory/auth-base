@@ -3,6 +3,7 @@ import { VerificationToken, User } from '../entities'
 import crypto from 'crypto'
 import { sendEmail } from '@things-factory/email-base'
 import { URL } from 'url'
+import { getVerificationEmailForm } from '../templates/verification-email'
 
 export async function sendVerificationEmail({ user, context }) {
   try {
@@ -15,7 +16,10 @@ export async function sendVerificationEmail({ user, context }) {
         sender: 'no-reply@hatiolab.com',
         receiver: user.email,
         subject: 'Verify your email',
-        content: `<a href="${serviceUrl}">Verify</a>`
+        content: getVerificationEmailForm({
+          name: user.name,
+          verifyUrl: serviceUrl
+        })
       })
 
       return true
