@@ -11,6 +11,7 @@ export const User = gql`
     userType: String
     domain: Domain
     domains: [Domain]
+    locale: String
     creator: User
     updater: User
     createdAt: String

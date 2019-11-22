@@ -93,7 +93,8 @@ export class User {
       id: this.id,
       email: this.email,
       userType: this.userType,
-      domain: this.domain
+      domain: this.domain,
+      locale: this.locale
     }
 
     return await jwt.sign(user, SECRET, {
