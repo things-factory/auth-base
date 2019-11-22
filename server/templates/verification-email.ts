@@ -30,7 +30,7 @@ export function getVerificationEmailForm({ name, verifyUrl }) {
             style="float:left;margin:0 10px 0 40px"
           />
           <span style="display:block;color:#fff;font-size:20px"
-            >Hey ${name}!</span
+            >Hi ${name}!</span
           >
           <span style="display:block;color:#fff;font-size:34px;font-weight:bold"
             >Verify Your Email Address.</span
