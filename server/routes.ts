@@ -1,18 +1,19 @@
 import { getPathInfo } from '@things-factory/shell'
 import koaBodyParser from 'koa-bodyparser'
 import { URL } from 'url'
+import { authcheck } from './controllers/authcheck'
 import { changePwd } from './controllers/change-pwd'
+import { updateProfile } from './controllers/profile'
 import { signin } from './controllers/signin'
 import { signup } from './controllers/signup'
-import { authcheck } from './controllers/authcheck'
-import { verify, resendVerificationEmail } from './controllers/verification'
+import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
 import { UserDomainNotMatchError } from './errors/user-domain-not-match-error'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  var paths = ['authcheck', 'verify', 'resend-verification-email']
+  var paths = ['authcheck', 'verify', 'resend-verification-email', 'update-profile']
 
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
 })
@@ -143,6 +144,19 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         domains: domains || [],
         ...body
       }
+    }
+  })
+
+  routes.post('/update-profile', koaBodyParser(bodyParserOption), async (context, next) => {
+    try {
+      let newProfiles = context.request.body
+      await updateProfile(context.state.user, newProfiles)
+
+      context.body = {
+        message: 'Success'
+      }
+    } catch (e) {
+      throw new Error(e)
     }
   })
 

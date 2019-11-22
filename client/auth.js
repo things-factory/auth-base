@@ -30,10 +30,11 @@ class ClientAuth {
     signupPath = 'signup',
     signinPath = 'signin',
     profilePath = 'authcheck',
+    updateProfilePath = 'update-profile',
+    changepassPath = 'change_pass',
     activatePage = 'activate',
     signinPage = 'signin',
     signupPage = 'signup',
-    changepassPath = 'change_pass',
     signoutPage,
     domainSelectPage = DEFAULT_DOMAIN_SELECT_PAGE,
     endpoint = ''
@@ -59,13 +60,14 @@ class ClientAuth {
     this.signupPath = signupPath
     this.signinPath = signinPath
     this.profilePath = profilePath
+    this.changepassPath = changepassPath
+    this.updateProfilePath = updateProfilePath
 
     this.activatePage = activatePage
     this.signinPage = signinPage
     this.signupPage = signupPage
     this.signoutPage = signoutPage
     this.domainSelectPage = domainSelectPage
-    this.changepassPath = changepassPath
   }
 
   on(event, handler) {
@@ -129,6 +131,7 @@ class ClientAuth {
       this.signout = provider.signout.bind(this)
       this.profile = provider.profile.bind(this)
       this.changePassword = provider.changePassword.bind(this)
+      this.updateProfile = provider.updateProfile.bind(this)
     } else {
       this.signup = this.signin = this.signout = this.profile = NOOP
     }

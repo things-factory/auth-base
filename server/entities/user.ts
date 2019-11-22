@@ -64,6 +64,11 @@ export class User {
   @Column({
     nullable: true
   })
+  locale: string
+
+  @Column({
+    nullable: true
+  })
   activated: boolean
 
   @ManyToOne(type => User, {
