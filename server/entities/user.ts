@@ -75,7 +75,7 @@ export class User {
   locale: string
 
   @Column({
-    type: 'enum',
+    type: 'smallint',
     enum: UserStatus,
     default: UserStatus.INACTIVE
   })
