@@ -9,11 +9,12 @@ import { signup } from './controllers/signup'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
 import { UserDomainNotMatchError } from './errors/user-domain-not-match-error'
+import { deleteAccount } from './controllers/delete-account'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  var paths = ['authcheck', 'verify', 'resend-verification-email', 'update-profile']
+  var paths = ['authcheck', 'verify', 'resend-verification-email', 'update-profile', 'delete-account']
 
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
 })
@@ -206,6 +207,25 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       if (succeed) {
         context.status = 200
         context.body = 'verification email sent'
+      }
+    } catch (e) {
+      throw new Error(e)
+    }
+  })
+
+  routes.post('/delete-account', koaBodyParser(bodyParserOption), async (context, next) => {
+    try {
+      var { user } = context.state
+      var succeed = await deleteAccount(user, context)
+
+      if (succeed) {
+        context.body = {
+          message: 'signout successfully'
+        }
+
+        context.cookies.set('access_token', '', {
+          httpOnly: true
+        })
       }
     } catch (e) {
       throw new Error(e)

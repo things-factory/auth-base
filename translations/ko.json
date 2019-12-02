@@ -1,15 +1,16 @@
 {
-  "field.email": "이메일",
-  "field.password": "패스워드",
-  "field.token": "토큰",
+  "field.active": "활성화",
   "field.appliance_id": "기구 아이디",
   "field.brand": "브랜드",
-  "field.model": "모델",
-  "field.active": "활성화",
   "field.category": "카테고리",
-  "field.roles": "규칙",
+  "field.email": "이메일",
+  "field.model": "모델",
+  "field.password": "패스워드",
   "field.priviledges": "권한",
+  "field.roles": "규칙",
+  "field.token": "토큰",
   "field.user": "사용자",
+  "field.user_account": "사용자 계정",
   "field.user_type": "사용자 유형",
-  "field.user_account": "사용자 계정"
+  "text.verification email resent": "인증 이메일이 성공적으로 재발송되었습니다."
 }

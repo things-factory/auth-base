@@ -18,6 +18,14 @@ import { Role } from './role'
 
 const SECRET = config.get('SECRET', '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95')
 
+export enum UserStatus {
+  INACTIVE = 'inactive',
+  ACTIVATED = 'activated',
+  DELETED = 'deleted',
+  LOCKED = 'locked',
+  BANNED = 'banned'
+}
+
 @Entity('users')
 @Index('ix_user_0', (user: User) => [user.email], { unique: true })
 export class User {
@@ -67,9 +75,17 @@ export class User {
   locale: string
 
   @Column({
-    nullable: true
+    type: 'enum',
+    enum: UserStatus,
+    default: UserStatus.INACTIVE
   })
-  activated: boolean
+  status: UserStatus
+
+  @Column({
+    type: 'smallint',
+    default: 0
+  })
+  failCount: number
 
   @ManyToOne(type => User, {
     nullable: true

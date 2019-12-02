@@ -1,8 +1,8 @@
-import { getRepository } from 'typeorm'
-import { VerificationToken, User } from '../entities'
-import crypto from 'crypto'
 import { sendEmail } from '@things-factory/email-base'
+import crypto from 'crypto'
+import { getRepository } from 'typeorm'
 import { URL } from 'url'
+import { User, UserStatus, VerificationToken } from '../entities'
 import { getVerificationEmailForm } from '../templates/verification-email'
 
 export async function sendVerificationEmail({ user, context }) {
@@ -52,8 +52,9 @@ export async function verify(token) {
 
   var userInfo = await getRepository(User).findOne(userId)
   if (!userInfo) return false
+  if (!(userInfo.status == UserStatus.INACTIVE || userInfo.status == UserStatus.LOCKED)) return false
 
-  userInfo.activated = true
+  userInfo.status = UserStatus.ACTIVATED
   await getRepository(User).save(userInfo)
   await getRepository(VerificationToken).delete({
     userId
@@ -70,7 +71,7 @@ export async function resendVerificationEmail(email, context) {
   })
 
   if (!user) return false
-  if (user.activated) return false
+  if (user.status == UserStatus.ACTIVATED) return false
 
   return await sendVerificationEmail({
     user,

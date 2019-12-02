@@ -1,6 +1,6 @@
 import { Domain } from '@things-factory/shell'
 import { getRepository, MigrationInterface, QueryRunner } from 'typeorm'
-import { User } from '../entities'
+import { User, UserStatus } from '../entities'
 
 const SEED_USERS = [
   {
@@ -8,7 +8,7 @@ const SEED_USERS = [
     email: 'admin@hatiolab.com',
     password: 'admin',
     userType: 'admin',
-    activated: true
+    status: UserStatus.ACTIVATED
   }
 ]
 
