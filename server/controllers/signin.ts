@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm'
-import { PASSWORD_NOT_MATCHED, USER_NOT_FOUND } from '../constants/error-code'
+import { PASSWORD_NOT_MATCHED, USER_DELETED, USER_NOT_FOUND } from '../constants/error-code'
 import { User, UserStatus } from '../entities'
 import { AuthError } from '../errors/auth-error'
 export async function signin(attrs) {
@@ -16,6 +16,12 @@ export async function signin(attrs) {
     await repository.save(user)
     throw new AuthError({
       errorCode: PASSWORD_NOT_MATCHED
+    })
+  }
+
+  if (user.status == UserStatus.DELETED) {
+    throw new AuthError({
+      errorCode: USER_DELETED
     })
   }
 

@@ -21,6 +21,10 @@ export async function authcheck({ id, domain }) {
         throw new AuthError({
           errorCode: ERROR_CODES.USER_LOCKED
         })
+      case UserStatus.DELETED:
+        throw new AuthError({
+          errorCode: ERROR_CODES.USER_DELETED
+        })
     }
 
     // 유저가 접속할 수 있는 도메인이 존재하는지 확인

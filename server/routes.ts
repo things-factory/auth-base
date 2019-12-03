@@ -10,6 +10,7 @@ import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
 import { UserDomainNotMatchError } from './errors/user-domain-not-match-error'
 import { deleteAccount } from './controllers/delete-account'
+import { getRepository } from 'typeorm'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
@@ -216,11 +217,30 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   routes.post('/delete-account', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
       var { user } = context.state
-      var succeed = await deleteAccount(user, context)
+      var { email: userEmail } = user
+
+      var { password, email } = context.request.body
+
+      const userRepo = getRepository(User)
+      const userInfo = await userRepo.findOne({
+        where: {
+          email: userEmail
+        }
+      })
+
+      if (email != userEmail || !userInfo.verify(password)) {
+        context.status = 404
+        context.body = {
+          message: 'id and password not matched'
+        }
+        return
+      }
+
+      var succeed = await deleteAccount(user)
 
       if (succeed) {
         context.body = {
-          message: 'signout successfully'
+          message: 'delete account succeed'
         }
 
         context.cookies.set('access_token', '', {
