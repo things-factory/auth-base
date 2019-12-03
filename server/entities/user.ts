@@ -17,6 +17,8 @@ import { config } from '@things-factory/env'
 import { Role } from './role'
 
 const SECRET = config.get('SECRET', '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95')
+const ORMCONFIG = config.get('ormconfig', {})
+const DATABASE_TYPE = ORMCONFIG.type
 
 export enum UserStatus {
   INACTIVE = 'inactive',
@@ -75,7 +77,7 @@ export class User {
   locale: string
 
   @Column({
-    type: 'smallint',
+    type: DATABASE_TYPE == 'postgres' || DATABASE_TYPE == 'mysql' || DATABASE_TYPE == 'mariadb' ? 'enum' : 'smallint',
     enum: UserStatus,
     default: UserStatus.INACTIVE
   })
