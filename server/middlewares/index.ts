@@ -6,9 +6,7 @@ import { authMiddleware } from './auth-middleware'
 process.on('bootstrap-module-middleware' as any, app => {
   /* 아래의 path로 시작하는 경우에만, authcheck를 한다. */
   let unlessOption = {
-    path: [
-      /^(?!.graphql|.file|.uploads|.authcheck|.update-profile|.change_pass|.resend-verification-email|.delete-account).*$/
-    ]
+    path: [/^(?!.graphql|.file|.uploads|.authcheck|.update-profile|.change_pass|.delete-account).*$/]
   }
   ;(app as any).use((authMiddleware as any).unless(unlessOption))
 })

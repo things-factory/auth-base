@@ -1,9 +1,10 @@
 import { sendEmail } from '@things-factory/email-base'
-import crypto from 'crypto'
 import { getRepository } from 'typeorm'
 import { URL } from 'url'
 import { User, UserStatus, VerificationToken } from '../entities'
 import { getVerificationEmailForm } from '../templates/verification-email'
+import { makeVerificationToken } from './utils/make-verification-token'
+import { saveVerificationToken } from './utils/save-verification-token'
 
 export async function sendVerificationEmail({ user, context }) {
   try {
@@ -27,18 +28,6 @@ export async function sendVerificationEmail({ user, context }) {
   } catch (e) {
     return false
   }
-}
-
-export function makeVerificationToken() {
-  return crypto.randomBytes(16).toString('hex')
-}
-
-export async function saveVerificationToken(id, token) {
-  const verificationRepo = getRepository(VerificationToken)
-  return await verificationRepo.save({
-    userId: id,
-    token
-  })
 }
 
 export async function verify(token) {

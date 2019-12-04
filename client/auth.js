@@ -36,6 +36,7 @@ class ClientAuth {
     activatePage = 'activate',
     signinPage = 'signin',
     signupPage = 'signup',
+    forgotPasswordPage = 'forgot-password',
     signoutPage,
     domainSelectPage = DEFAULT_DOMAIN_SELECT_PAGE,
     endpoint = ''
@@ -68,6 +69,7 @@ class ClientAuth {
     this.activatePage = activatePage
     this.signinPage = signinPage
     this.signupPage = signupPage
+    this.forgotPasswordPage = forgotPasswordPage
     this.signoutPage = signoutPage
     this.domainSelectPage = domainSelectPage
   }

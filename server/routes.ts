@@ -10,7 +10,9 @@ import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
 import { UserDomainNotMatchError } from './errors/user-domain-not-match-error'
 import { deleteAccount } from './controllers/delete-account'
+import { resetPassword, sendPasswordResetEmail } from './controllers/reset-password'
 import { getRepository } from 'typeorm'
+import { USER_NOT_ACTIVATED } from './constants/error-code'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
@@ -57,8 +59,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   })
 
   routes.post('/signin', koaBodyParser(bodyParserOption), async (context, next) => {
+    let user = context.request.body
     try {
-      let user = context.request.body
       let { token, domains } = await signin(user)
 
       context.body = {
@@ -71,7 +73,12 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         httpOnly: true,
         maxAge: MAX_AGE
       })
+      context.cookies.set('verify_email', '')
     } catch (e) {
+      if (e.message == USER_NOT_ACTIVATED) {
+        context.cookies.set('verify_email', user.email)
+      }
+
       context.status = 401
       context.body = {
         message: e.message
@@ -136,6 +143,10 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
             user: context.state.user
           }
         }
+
+        if (e.message == USER_NOT_ACTIVATED) {
+          context.cookies.set('verify_email', context.state.user.email)
+        }
       } else {
         status = 500
       }
@@ -198,16 +209,13 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
   routes.get('/resend-verification-email', async (context, next) => {
     try {
-      var { user } = context.state
-
-      if (!user) return next()
-
-      var { email } = user
+      const email = context.cookies.get('verify_email')
       var succeed = await resendVerificationEmail(email, context)
 
       if (succeed) {
         context.status = 200
         context.body = 'verification email sent'
+        context.cookies.set('verify_email', '')
       }
     } catch (e) {
       throw new Error(e)
@@ -246,6 +254,62 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         context.cookies.set('access_token', '', {
           httpOnly: true
         })
+      }
+    } catch (e) {
+      throw new Error(e)
+    }
+  })
+
+  routes.post('/forgot-password', koaBodyParser(bodyParserOption), async (context, next) => {
+    try {
+      var { email } = context.request.body
+      if (!email) return next()
+
+      const userRepo = getRepository(User)
+      const user = await userRepo.findOne({
+        where: {
+          email
+        }
+      })
+
+      var succeed = await sendPasswordResetEmail({
+        user,
+        context
+      })
+
+      if (succeed) {
+        context.status = 200
+        context.body = 'password reset email sent'
+      }
+    } catch (e) {
+      throw new Error(e)
+    }
+  })
+
+  routes.post('/reset-password', async (context, next) => {
+    try {
+      var { password, token } = context.request.body
+
+      if (!(token || password)) {
+        context.status = 404
+        context.body = {
+          message: 'token or password is invalid'
+        }
+        return
+      }
+
+      var succeed = await resetPassword(token, password)
+
+      if (succeed) {
+        context.body = {
+          message: 'password reset succeed'
+        }
+
+        context.cookies.set('access_token', '', {
+          httpOnly: true
+        })
+
+        context.redirect('/')
       }
     } catch (e) {
       throw new Error(e)
