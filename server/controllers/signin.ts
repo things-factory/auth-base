@@ -10,18 +10,18 @@ export async function signin(attrs) {
       errorCode: USER_NOT_FOUND
     })
 
+  if (user.status == UserStatus.DELETED) {
+    throw new AuthError({
+      errorCode: USER_DELETED
+    })
+  }
+
   if (!user.verify(attrs.password)) {
     user.failCount++
     if (user.failCount >= 5) user.status = UserStatus.LOCKED
     await repository.save(user)
     throw new AuthError({
       errorCode: PASSWORD_NOT_MATCHED
-    })
-  }
-
-  if (user.status == UserStatus.DELETED) {
-    throw new AuthError({
-      errorCode: USER_DELETED
     })
   }
 
