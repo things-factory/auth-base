@@ -1,5 +1,7 @@
-import { User } from '../entities'
+import { getPathInfo } from '@things-factory/shell'
 import unless from 'koa-unless'
+import { URL } from 'url'
+import { User } from '../entities'
 ;(authMiddleware as any).unless = unless
 
 function getToken(context) {
@@ -24,17 +26,24 @@ function getToken(context) {
 
 export async function authMiddleware(context, next) {
   try {
+    var { request } = context
+    var { header } = request
+    var { referer } = header
+    var { pathname, protocol } = new URL(referer)
+    var { contextPath, domain } = getPathInfo(pathname)
     var token = getToken(context)
 
     if (!token) {
       throw Error('not signed in')
     }
 
-    context.state.user = await User.check(token)
+    var decodedToken = await User.check(token)
+    context.state.user = await User.checkAuth(decodedToken)
 
     return next()
   } catch (e) {
-    context.status = 401
+    let status = 401
+    context.status = status
     context.body = {
       success: false,
       message: e.message

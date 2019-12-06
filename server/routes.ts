@@ -1,23 +1,23 @@
 import { getPathInfo } from '@things-factory/shell'
 import koaBodyParser from 'koa-bodyparser'
+import { getRepository } from 'typeorm'
 import { URL } from 'url'
+import { USER_NOT_ACTIVATED } from './constants/error-code'
 import { authcheck } from './controllers/authcheck'
 import { changePwd } from './controllers/change-pwd'
+import { deleteAccount } from './controllers/delete-account'
 import { updateProfile } from './controllers/profile'
+import { resetPassword, sendPasswordResetEmail } from './controllers/reset-password'
 import { signin } from './controllers/signin'
 import { signup } from './controllers/signup'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
-import { UserDomainNotMatchError } from './errors/user-domain-not-match-error'
-import { deleteAccount } from './controllers/delete-account'
-import { resetPassword, sendPasswordResetEmail } from './controllers/reset-password'
-import { getRepository } from 'typeorm'
-import { USER_NOT_ACTIVATED } from './constants/error-code'
+import { DomainError } from './errors/user-domain-not-match-error'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  var paths = ['authcheck', 'verify', 'resend-verification-email', 'update-profile', 'delete-account']
+  var paths = ['authcheck', 'verify', 'update-profile', 'delete-account', '/']
 
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
 })
@@ -61,24 +61,28 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   routes.post('/signin', koaBodyParser(bodyParserOption), async (context, next) => {
     let user = context.request.body
     try {
-      let { token, domains } = await signin(user)
+      let { request } = context
+      let { header } = request
+      let { referer } = header
+      let { protocol } = new URL(referer)
+      let { user: userInfo, token, domains } = await signin(user)
+      let redirectTo = 'domain-select'
+
+      if (userInfo.domain) redirectTo = `/domain/${userInfo.domain.subdomain}`
 
       context.body = {
         message: 'signin successfully',
         token,
-        domains
+        domains,
+        redirectTo
       }
 
       context.cookies.set('access_token', token, {
+        secure: protocol == 'https' ? true : false,
         httpOnly: true,
         maxAge: MAX_AGE
       })
-      context.cookies.set('verify_email', '')
     } catch (e) {
-      if (e.message == USER_NOT_ACTIVATED) {
-        context.cookies.set('verify_email', user.email)
-      }
-
       context.status = 401
       context.body = {
         message: e.message
@@ -108,44 +112,31 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       var { request } = context
       var { header } = request
       var { referer } = header
-      var { pathname } = new URL(referer)
-      var { domain } = getPathInfo(pathname)
+      var { protocol, pathname } = new URL(referer)
+      var { contextPath, domain, path } = getPathInfo(pathname)
 
-      // 새로운 토큰 발급
-      var { token, domains } = await authcheck({
-        id: context.state.user.id,
-        domain
-      })
+      const user = context.state.user
 
-      context.cookies.set('access_token', token, {
-        httpOnly: true,
-        maxAge: MAX_AGE
-      })
-
-      context.state.user = await User.check(token)
+      var { domains } = await User.checkAuth(user)
 
       context.body = {
         message: 'token checked successfully',
-        token,
         domains,
-        user: context.state.user // jwt-koa or authMiddleware will set context.state.token, user
+        user, // jwt-koa or authMiddleware will set context.state.token, user
+        redirectTo: user.domain ? `/domain/${user.domain}` : null
       }
     } catch (e) {
       var status = 401
       var body = {}
       if (e.errorCode) {
         body['errorCode'] = e.errorCode
-        if (e instanceof UserDomainNotMatchError) {
+        if (e instanceof DomainError) {
           status = 406
           body = {
             ...body,
             domains: e.domains,
             user: context.state.user
           }
-        }
-
-        if (e.message == USER_NOT_ACTIVATED) {
-          context.cookies.set('verify_email', context.state.user.email)
         }
       } else {
         status = 500
@@ -197,8 +188,9 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       var token = context.params.token
       var isVerified = await verify(token)
 
-      if (isVerified) context.redirect('/')
-      else {
+      if (isVerified) {
+        context.redirect(`/congratulations`)
+      } else {
         context.status = 404
         context.body = 'User or verification token not found'
       }
@@ -207,15 +199,15 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     }
   })
 
-  routes.get('/resend-verification-email', async (context, next) => {
+  routes.post('/resend-verification-email', koaBodyParser(bodyParserOption), async (context, next) => {
+    const { email } = context.request.body
     try {
-      const email = context.cookies.get('verify_email')
       var succeed = await resendVerificationEmail(email, context)
+      var message = 'verification email sent'
 
       if (succeed) {
         context.status = 200
-        context.body = 'verification email sent'
-        context.cookies.set('verify_email', '')
+        context.body = message
       }
     } catch (e) {
       throw new Error(e)
@@ -286,7 +278,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     }
   })
 
-  routes.post('/reset-password', async (context, next) => {
+  routes.post('/reset-password', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
       var { password, token } = context.request.body
 
@@ -301,15 +293,14 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       var succeed = await resetPassword(token, password)
 
       if (succeed) {
+        var message = 'password reset succeed'
         context.body = {
-          message: 'password reset succeed'
+          message
         }
 
         context.cookies.set('access_token', '', {
           httpOnly: true
         })
-
-        context.redirect('/')
       }
     } catch (e) {
       throw new Error(e)

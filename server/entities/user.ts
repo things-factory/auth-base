@@ -1,3 +1,5 @@
+import { config } from '@things-factory/env'
+import { Domain } from '@things-factory/shell'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import {
@@ -12,8 +14,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { Domain } from '@things-factory/shell'
-import { config } from '@things-factory/env'
+import { AuthError } from '../errors/auth-error'
+import { DomainError } from '../errors/user-domain-not-match-error'
 import { Role } from './role'
 
 const SECRET = config.get('SECRET', '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95')
@@ -140,17 +142,78 @@ export class User {
     return this.password === encrypted
   }
 
+  async checkDomain(domainName) {
+    if (!domainName) {
+      if (this.domain && this.domain.subdomain) {
+        throw new DomainError({
+          errorCode: DomainError.ERROR_CODES.REDIRECT_TO_DEFAULT_DOMAIN,
+          domains: this.domains
+        })
+      } else {
+        throw new DomainError({
+          errorCode: DomainError.ERROR_CODES.NO_SELECTED_DOMAIN,
+          domains: this.domains
+        })
+      }
+    } else {
+      if (!this.domains || this.domains.length == 0)
+        throw new DomainError({
+          errorCode: DomainError.ERROR_CODES.NO_AVAILABLE_DOMAIN,
+          domains: []
+        })
+
+      let foundDomain = this.domains.find(d => d.subdomain == domainName)
+      if (!foundDomain)
+        throw new DomainError({
+          errorCode: DomainError.ERROR_CODES.UNAVAILABLE_DOMAIN,
+          domains: this.domains
+        })
+
+      const repository = getRepository(User)
+      this.domain = foundDomain
+      await repository.save(this)
+    }
+
+    return {
+      token: await this.sign(),
+      domains: this.domains
+    }
+  }
+
   /* verify jsonwebtoken */
   static async check(token: string) {
     var decoded = await jwt.verify(token, SECRET)
 
-    const repository = getRepository(User)
-    var user = await repository.findOne(decoded.id)
-
-    if (!user) {
-      throw new Error('user notfound.')
-    }
-
     return decoded
+  }
+
+  static async checkAuth(decoded) {
+    const repository = getRepository(User)
+    var user = await repository.findOne(decoded.id, {
+      relations: ['domain', 'domains']
+    })
+
+    if (!user)
+      throw new AuthError({
+        errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND
+      })
+    else {
+      switch (user.status) {
+        case UserStatus.INACTIVE:
+          throw new AuthError({
+            errorCode: AuthError.ERROR_CODES.USER_NOT_ACTIVATED
+          })
+        case UserStatus.LOCKED:
+          throw new AuthError({
+            errorCode: AuthError.ERROR_CODES.USER_LOCKED
+          })
+        case UserStatus.DELETED:
+          throw new AuthError({
+            errorCode: AuthError.ERROR_CODES.USER_DELETED
+          })
+      }
+
+      return user
+    }
   }
 }

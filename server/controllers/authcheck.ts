@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm'
 import * as ERROR_CODES from '../constants/error-code'
 import { User, UserStatus } from '../entities'
 import { AuthError } from '../errors/auth-error'
-import { UserDomainNotMatchError } from '../errors/user-domain-not-match-error'
+import { DomainError } from '../errors/user-domain-not-match-error'
 export async function authcheck({ id, domain }) {
   const repository = getRepository(User)
   const user = await repository.findOne({ where: { id }, relations: ['domain', 'domains'] })
@@ -29,7 +29,7 @@ export async function authcheck({ id, domain }) {
 
     // 유저가 접속할 수 있는 도메인이 존재하는지 확인
     if (!user.domains || !user.domains.length)
-      throw new UserDomainNotMatchError({
+      throw new DomainError({
         errorCode: ERROR_CODES.NO_AVAILABLE_DOMAIN,
         domains: []
       })
@@ -40,18 +40,19 @@ export async function authcheck({ id, domain }) {
   if (domain) {
     var foundDomain = domains.find(d => d.subdomain == domain)
     if (!foundDomain)
-      throw new UserDomainNotMatchError({
+      throw new DomainError({
         errorCode: ERROR_CODES.UNAVAILABLE_DOMAIN,
         domains: domains
       })
     else {
       user.domain = foundDomain
-      await repository.save(user)
+      // await repository.save(user)
     }
   }
-  var token = await user.sign()
+  // return true
+  // var token = await user.sign()
   return {
-    token,
+    // token,
     domains
   }
 }

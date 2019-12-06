@@ -35,6 +35,7 @@ export async function signin(attrs) {
   }
 
   return {
+    user,
     token: await user.sign(),
     domains: user.domains || []
   }

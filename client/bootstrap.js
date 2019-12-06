@@ -1,4 +1,4 @@
-import { store, getPathInfo, makeContextPath, updateDomains } from '@things-factory/shell'
+import { store, updateDomains } from '@things-factory/shell'
 import { updateAuthenticated, updateUser } from './actions/auth'
 import { auth } from './auth'
 import reducerAuth from './reducers/auth'
@@ -21,11 +21,6 @@ export default function bootstrap() {
   auth.on('profile', ({ credential, domains }) => {
     store.dispatch(updateUser(credential))
     store.dispatch(updateDomains(domains))
-
-    var { contextPath, domain, path } = getPathInfo(location.pathname)
-    path = path.replace('/', '')
-
-    if (!contextPath && credential.domain) auth.route(`${makeContextPath(credential.domain.subdomain)}${path}`)
   })
 
   auth.on('domain-not-available', ({ credential, domains }) => {

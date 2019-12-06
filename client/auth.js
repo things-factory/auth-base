@@ -186,7 +186,7 @@ class ClientAuth {
       document.addEventListener(this.domainNotAvailableEvent, this._domainNotAvailableEventListener)
   }
 
-  onSignedIn({ accessToken, domains }) {
+  onSignedIn({ accessToken, domains, redirectTo }) {
     this.accessToken = accessToken
     this.domains = domains
 
@@ -201,7 +201,7 @@ class ClientAuth {
     } else {
       /* signin/signup page에 직접(주소창 입력, 링크) 들어온 경우 */
       /* signout을 통해서 들어온 경우 */
-      this.route(this.fullpage(this.defaultRoutePage), false)
+      this.route(this.fullpage(redirectTo || this.defaultRoutePage), false)
     }
   }
 
@@ -250,13 +250,14 @@ class ClientAuth {
 
   onActivateRequired(e) {
     console.warn('activate required')
-    this.route(this.fullpage(this.activatePage), false)
+    window.location.replace(this.fullpage(`${this.activatePage}?email=${e.email}`))
   }
 
   onDomainNotAvailable(e) {
+    var { redirectTo } = e.detail
     console.warn('domain not available')
     this._event_listeners['domain-not-available'].forEach(handler => handler(e))
-    this.route(this.fullpage(this.domainSelectPage))
+    this.route(this.fullpage(redirectTo || this.domainSelectPage))
   }
 
   route(path, redirected) {

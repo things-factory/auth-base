@@ -1,7 +1,20 @@
+import {
+  NO_AVAILABLE_DOMAIN,
+  NO_SELECTED_DOMAIN,
+  REDIRECT_TO_DEFAULT_DOMAIN,
+  UNAVAILABLE_DOMAIN
+} from '../constants/error-code'
 import { AuthError } from './auth-error'
-import { UNAVAILABLE_DOMAIN } from '../constants/error-code'
 
-export class UserDomainNotMatchError extends AuthError {
+export class DomainError extends AuthError {
+  static get ERROR_CODES(): any {
+    return {
+      UNAVAILABLE_DOMAIN,
+      NO_AVAILABLE_DOMAIN,
+      NO_SELECTED_DOMAIN,
+      REDIRECT_TO_DEFAULT_DOMAIN
+    }
+  }
   domains: any
   constructor({ errorCode = UNAVAILABLE_DOMAIN, domains }) {
     super({
