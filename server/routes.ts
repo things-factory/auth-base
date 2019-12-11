@@ -148,8 +148,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   })
 
   routes.get('/domain-select', async (context, next) => {
+    var { request, protocol } = context
     try {
-      var { request } = context
       var { originalUrl } = request
 
       const token = getToken(context)
@@ -166,6 +166,10 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         }
       })
     } catch (e) {
+      context.cookies.set('access_token', '', {
+        secure: protocol == 'http' ? false : true,
+        httpOnly: true
+      })
       context.redirect('/signin')
     }
   })
