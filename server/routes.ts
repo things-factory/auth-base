@@ -90,9 +90,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   // static pages
   routes.get('/signin', async (context, next) => {
     try {
-      const { request } = context
-      const { header } = request
-      const { referer } = header
+      const { query } = context
+      const { redirect_to } = query
       // check signed in
       const token = getToken(context)
       if (!token)
@@ -100,7 +99,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
           pageElement: 'auth-signin',
           elementScript: '/signin.js',
           data: {
-            redirectTo: referer
+            redirectTo: redirect_to
           }
         })
 
@@ -148,10 +147,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   })
 
   routes.get('/domain-select', async (context, next) => {
-    var { request, protocol } = context
+    const { secure } = context
     try {
-      var { originalUrl } = request
-
       const token = getToken(context)
       if (!token) return context.redirect('/signin')
       const user = await User.check(token)
@@ -167,7 +164,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       })
     } catch (e) {
       context.cookies.set('access_token', '', {
-        secure: protocol == 'http' ? false : true,
+        secure,
         httpOnly: true
       })
       context.redirect('/signin')
@@ -216,7 +213,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
   routes.get('/checkin/:domainName', async (context, next) => {
     try {
-      const { params, protocol } = context
+      const { params, secure } = context
       const { domainName } = params
       const { user } = context.state
 
@@ -227,7 +224,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
       if (newToken) {
         context.cookies.set('access_token', newToken, {
-          secure: protocol == 'https' ? true : false,
+          secure,
           httpOnly: true,
           maxAge: MAX_AGE
         })
@@ -244,13 +241,10 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   routes.post('/signin', koaBodyParser(bodyParserOption), async (context, next) => {
     let user = context.request.body
     try {
-      let { request } = context
-      let { header } = request
-      let { referer } = header
-      let { protocol } = new URL(referer)
-      let { user: userInfo, token, domains } = await signin(user)
+      const { secure } = context
+      const { user: userInfo, token, domains } = await signin(user)
 
-      let redirectTo = user.redirect_to || getDefaultDomain(userInfo)
+      const redirectTo = user.redirect_to || getDefaultDomain(userInfo)
 
       let responseObj = {
         message: 'signin successfully',
@@ -259,7 +253,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       }
 
       context.cookies.set('access_token', token, {
-        secure: protocol == 'https' ? true : false,
+        secure,
         httpOnly: true,
         maxAge: MAX_AGE
       })

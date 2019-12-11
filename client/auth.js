@@ -233,7 +233,10 @@ class ClientAuth {
 
   onAuthRequired(e) {
     console.warn('authentication required')
-    window.location.pathname = `/${this.signinPage}`
+    let url = new URL(window.location)
+    url.pathname = this.signinPage
+    url.searchParams.append('redirect_to', window.location.href)
+    window.location = url
   }
 
   onActivateRequired(e) {
