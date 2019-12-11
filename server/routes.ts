@@ -148,22 +148,26 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   })
 
   routes.get('/domain-select', async (context, next) => {
-    var { request } = context
-    var { originalUrl } = request
+    try {
+      var { request } = context
+      var { originalUrl } = request
 
-    const token = getToken(context)
-    if (!token) return context.redirect('/signin')
-    const user = await User.check(token)
-    if (!user) return context.redirect('/signin')
-    const { domains } = await User.checkAuth(user)
+      const token = getToken(context)
+      if (!token) return context.redirect('/signin')
+      const user = await User.check(token)
+      if (!user) return context.redirect('/signin')
+      const { domains } = await User.checkAuth(user)
 
-    await context.render('auth-page', {
-      pageElement: 'auth-domain-select',
-      elementScript: '/domain-select.js',
-      data: {
-        domains
-      }
-    })
+      await context.render('auth-page', {
+        pageElement: 'auth-domain-select',
+        elementScript: '/domain-select.js',
+        data: {
+          domains
+        }
+      })
+    } catch (e) {
+      context.redirect('/signin')
+    }
   })
 
   routes.get('/forgot-password', async (context, next) => {
