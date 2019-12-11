@@ -33,6 +33,7 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     'signin',
     'signup',
     'signout',
+    'default-domain',
     'domain-select',
     'forgot-password',
     'reset-password',
