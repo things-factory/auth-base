@@ -37,22 +37,26 @@ export async function authcheck({ id, domain }) {
 
   var domains = user.domains
   // 접속한 URL과 일치하는 도메인이 존재하는지 확인
-  if (domain) {
-    var foundDomain = domains.find(d => d.subdomain == domain)
-    if (!foundDomain)
-      throw new DomainError({
-        errorCode: ERROR_CODES.UNAVAILABLE_DOMAIN,
-        domains: domains
-      })
-    else {
-      user.domain = foundDomain
-      // await repository.save(user)
-    }
+  if (!domain)
+    throw new DomainError({
+      errorCode: ERROR_CODES.NO_SELECTED_DOMAIN,
+      domains: domains
+    })
+
+  var foundDomain = domains.find(d => d.subdomain == domain)
+  if (!foundDomain)
+    throw new DomainError({
+      errorCode: ERROR_CODES.UNAVAILABLE_DOMAIN,
+      domains: domains
+    })
+  else {
+    user.domain = foundDomain
+    await repository.save(user)
   }
   // return true
-  // var token = await user.sign()
+  var token = await user.sign()
   return {
-    // token,
+    token,
     domains
   }
 }

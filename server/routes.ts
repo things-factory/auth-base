@@ -2,9 +2,9 @@ import { getPathInfo } from '@things-factory/shell'
 import koaBodyParser from 'koa-bodyparser'
 import { getRepository } from 'typeorm'
 import { URL } from 'url'
-import { USER_NOT_ACTIVATED } from './constants/error-code'
 import { authcheck } from './controllers/authcheck'
 import { changePwd } from './controllers/change-pwd'
+import { checkin } from './controllers/checkin'
 import { deleteAccount } from './controllers/delete-account'
 import { updateProfile } from './controllers/profile'
 import { resetPassword, sendPasswordResetEmail } from './controllers/reset-password'
@@ -13,13 +13,70 @@ import { signup } from './controllers/signup'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
 import { DomainError } from './errors/user-domain-not-match-error'
+import { getToken } from './utils/get-token'
+import { AuthError } from './errors/auth-error'
+import Router from 'koa-router'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
-process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  var paths = ['authcheck', 'verify', 'update-profile', 'delete-account', '/']
+function getDefaultDomain(userInfo, fallbackUrl = '/domain-select') {
+  let redirectTo = fallbackUrl
+  // if (userInfo.domain) redirectTo = `/domain/${userInfo.domain.subdomain}`
+  if (userInfo.domain) redirectTo = `/checkin/${userInfo.domain.subdomain}`
 
+  return redirectTo
+}
+
+process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
+  var paths = [
+    // static pages
+    'signin',
+    'signup',
+    'signout',
+    'domain-select',
+    'forgot-password',
+    'reset-password',
+    'activate',
+    'congratulations',
+    // apis
+    'checkin',
+    'profile',
+    'verify',
+    'update-profile',
+    'delete-account'
+    // 'domain'
+  ]
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
+
+  const domainRouter = new Router()
+
+  domainRouter.get('/', async (context, next) => {
+    const token = getToken(context)
+    if (!token) return context.redirect('/signin')
+    const decodedToken = await User.check(token)
+    if (!decodedToken) return context.redirect('/signin')
+    return context.redirect('/default-domain')
+  })
+  domainRouter.get('/domain/:domainName', async (context, next) => {
+    const token = getToken(context)
+    const decodedToken = await User.check(token)
+    const { params } = context
+    const { domainName } = params
+
+    const user = await getRepository(User).findOne({
+      where: {
+        id: decodedToken.id
+      },
+      relations: ['domain', 'domains']
+    })
+
+    if (!user) return context.redirect('/signin')
+    if (!user.domain || user.domain.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
+
+    return next()
+  })
+
+  app.use(domainRouter.routes())
 })
 
 process.on('bootstrap-module-route' as any, (app, routes) => {
@@ -29,7 +86,196 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     textLimit: '10mb'
   }
 
+  // static pages
+  routes.get('/signin', async (context, next) => {
+    try {
+      const { request } = context
+      const { header } = request
+      const { referer } = header
+      // check signed in
+      const token = getToken(context)
+      if (!token)
+        return await context.render('auth-page', {
+          pageElement: 'auth-signin',
+          elementScript: '/signin.js',
+          data: {
+            redirectTo: referer
+          }
+        })
+
+      const user = await User.check(token)
+      const redirectTo = getDefaultDomain(user)
+
+      context.redirect(redirectTo)
+    } catch (e) {
+      await context.render('auth-page', {
+        pageElement: 'auth-signin',
+        elementScript: '/signin.js',
+        data: {}
+      })
+    }
+  })
+
+  routes.get('/signup', async (context, next) => {
+    await context.render('auth-page', {
+      pageElement: 'auth-signup',
+      elementScript: '/signup.js',
+      data: {}
+    })
+  })
+
+  routes.get('/signout', async (context, next) => {
+    context.body = {
+      message: 'signout successfully'
+    }
+
+    context.cookies.set('access_token', '', {
+      httpOnly: true
+    })
+
+    context.redirect('/')
+  })
+
+  routes.get('/default-domain', async (context, next) => {
+    const token = getToken(context)
+    if (!token) return context.redirect('/signin')
+    const user = await User.check(token)
+    if (!user) return context.redirect('/signin')
+
+    if (!user.domain) return context.redirect('/domain-select')
+    return context.redirect(`/domain/${user.domain.subdomain}`)
+  })
+
+  routes.get('/domain-select', async (context, next) => {
+    var { request } = context
+    var { originalUrl } = request
+
+    const token = getToken(context)
+    if (!token) return context.redirect('/signin')
+    const user = await User.check(token)
+    if (!user) return context.redirect('/signin')
+    const { domains } = await User.checkAuth(user)
+
+    await context.render('auth-page', {
+      pageElement: 'auth-domain-select',
+      elementScript: '/domain-select.js',
+      data: {
+        domains
+      }
+    })
+  })
+
+  routes.get('/forgot-password', async (context, next) => {
+    await context.render('auth-page', {
+      pageElement: 'forgot-password',
+      elementScript: '/forgot-password.js',
+      data: {}
+    })
+  })
+
+  routes.get('/reset-password', async (context, next) => {
+    const { token } = context.request.query
+    await context.render('auth-page', {
+      pageElement: 'reset-password',
+      elementScript: '/reset-password.js',
+      data: {
+        token
+      }
+    })
+  })
+
+  routes.get('/activate/:email', async (context, next) => {
+    const { email } = context.params
+    await context.render('auth-page', {
+      pageElement: 'auth-activate',
+      elementScript: '/activate.js',
+      data: {
+        email
+      }
+    })
+  })
+
+  routes.get('/congratulations', async (context, next) => {
+    await context.render('auth-page', {
+      pageElement: 'auth-congratulations',
+      elementScript: '/congratulations.js',
+      data: {
+        message: 'congratulations'
+      }
+    })
+  })
+
+  routes.get('/checkin/:domainName', async (context, next) => {
+    try {
+      const { params, protocol } = context
+      const { domainName } = params
+      const { user } = context.state
+
+      const newToken = await checkin({
+        userId: user.id,
+        domainName
+      })
+
+      if (newToken) {
+        context.cookies.set('access_token', newToken, {
+          secure: protocol == 'https' ? true : false,
+          httpOnly: true,
+          maxAge: MAX_AGE
+        })
+        context.redirect(`/domain/${domainName}`)
+      } else {
+        context.redirect('/domain-select')
+      }
+    } catch (e) {
+      context.redirect('/domain-select')
+    }
+  })
+
   // for authentication
+  routes.post('/signin', koaBodyParser(bodyParserOption), async (context, next) => {
+    let user = context.request.body
+    try {
+      let { request } = context
+      let { header } = request
+      let { referer } = header
+      let { protocol } = new URL(referer)
+      let { user: userInfo, token, domains } = await signin(user)
+
+      let redirectTo = user.redirect_to || getDefaultDomain(userInfo)
+
+      let responseObj = {
+        message: 'signin successfully',
+        token,
+        domains
+      }
+
+      context.cookies.set('access_token', token, {
+        secure: protocol == 'https' ? true : false,
+        httpOnly: true,
+        maxAge: MAX_AGE
+      })
+
+      context.redirect(redirectTo)
+    } catch (e) {
+      context.status = 401
+      context.body = {
+        message: e.message
+      }
+
+      if (e.errorCode == AuthError.ERROR_CODES.USER_NOT_ACTIVATED) {
+        context.redirect(`/activate/${user.email}`)
+      } else {
+        await context.render('auth-page', {
+          pageElement: 'auth-signin',
+          elementScript: '/signin.js',
+          data: {
+            message: e.message
+          }
+        })
+      }
+    }
+  })
+
   routes.post('/signup', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
       let user = context.request.body
@@ -50,43 +296,21 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         httpOnly: true,
         maxAge: MAX_AGE
       })
+
+      context.redirect(`/activate/${user.email}`)
     } catch (e) {
       context.status = 401
       context.body = {
         message: e.message
       }
-    }
-  })
 
-  routes.post('/signin', koaBodyParser(bodyParserOption), async (context, next) => {
-    let user = context.request.body
-    try {
-      let { request } = context
-      let { header } = request
-      let { referer } = header
-      let { protocol } = new URL(referer)
-      let { user: userInfo, token, domains } = await signin(user)
-      let redirectTo = 'domain-select'
-
-      if (userInfo.domain) redirectTo = `/domain/${userInfo.domain.subdomain}`
-
-      context.body = {
-        message: 'signin successfully',
-        token,
-        domains,
-        redirectTo
-      }
-
-      context.cookies.set('access_token', token, {
-        secure: protocol == 'https' ? true : false,
-        httpOnly: true,
-        maxAge: MAX_AGE
+      await context.render('auth-page', {
+        pageElement: 'auth-signup',
+        elementScript: '/signup.js',
+        data: {
+          message: e.message
+        }
       })
-    } catch (e) {
-      context.status = 401
-      context.body = {
-        message: e.message
-      }
     }
   })
 
@@ -107,46 +331,29 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     }
   })
 
-  routes.get('/authcheck', async (context, next) => {
+  routes.get('/profile', async (context, next) => {
     try {
-      var { request } = context
-      var { header } = request
-      var { referer } = header
-      var { protocol, pathname } = new URL(referer)
-      var { contextPath, domain, path } = getPathInfo(pathname)
-
-      const user = context.state.user
-
-      var { domains } = await User.checkAuth(user)
+      const { request } = context
+      const { header } = request
+      const { referer } = header
+      const { pathname } = new URL(referer)
+      const { domain, path, contextPath } = getPathInfo(pathname)
+      const userRepo = getRepository(User)
+      const user = await userRepo.findOne({
+        where: {
+          id: context.state.user.id
+        },
+        relations: ['domain', 'domains']
+      })
 
       context.body = {
-        message: 'token checked successfully',
-        domains,
-        user, // jwt-koa or authMiddleware will set context.state.token, user
-        redirectTo: user.domain ? `/domain/${user.domain}` : null
+        user,
+        domains: user.domains // jwt-koa or authMiddleware will set context.state.token, user
       }
     } catch (e) {
-      var status = 401
-      var body = {}
-      if (e.errorCode) {
-        body['errorCode'] = e.errorCode
-        if (e instanceof DomainError) {
-          status = 406
-          body = {
-            ...body,
-            domains: e.domains,
-            user: context.state.user
-          }
-        }
-      } else {
-        status = 500
-      }
-
-      context.status = status
       context.body = {
         message: e.message,
-        domains: domains || [],
-        ...body
+        domains: []
       }
     }
   })
@@ -193,6 +400,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       } else {
         context.status = 404
         context.body = 'User or verification token not found'
+        context.redirect('/signin')
       }
     } catch (e) {
       throw new Error(e)
@@ -300,6 +508,14 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
         context.cookies.set('access_token', '', {
           httpOnly: true
+        })
+
+        await context.render('auth-page', {
+          pageElement: 'auth-congratulations',
+          elementScript: '/congratulations.js',
+          data: {
+            message: 'password change succeed'
+          }
         })
       }
     } catch (e) {

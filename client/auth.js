@@ -29,7 +29,7 @@ class ClientAuth {
     domainNotAvailableEvent = DEFAULT_DOMAIN_NOT_AVAILABLE_EVENT,
     signupPath = 'signup',
     signinPath = 'signin',
-    profilePath = 'authcheck',
+    profilePath = 'profile',
     updateProfilePath = 'update-profile',
     changepassPath = 'change_pass',
     deleteAccountPath = 'delete-account',
@@ -191,18 +191,6 @@ class ClientAuth {
     this.domains = domains
 
     this._event_listeners.signin.forEach(handler => handler({ accessToken, domains }))
-
-    var lastUrl = sessionStorage.getItem('lastUrl')
-
-    if (lastUrl) {
-      /* authRequired를 통해서 들어온 경우 */
-      sessionStorage.removeItem('lastUrl')
-      location.replace(lastUrl)
-    } else {
-      /* signin/signup page에 직접(주소창 입력, 링크) 들어온 경우 */
-      /* signout을 통해서 들어온 경우 */
-      this.route(this.fullpage(redirectTo || this.defaultRoutePage), false)
-    }
   }
 
   onProfileFetched({ credential, accessToken, domains }) {
@@ -225,7 +213,7 @@ class ClientAuth {
     this.domains = []
     this._event_listeners.signout.forEach(handler => handler())
 
-    this.route(this.fullpage(this.signoutPage ? this.signoutPage : this.signinPage), false)
+    window.location.replace(`/${this.signoutPage ? this.signoutPage : this.signinPage}`)
   }
 
   onAuthError(error) {
@@ -245,7 +233,7 @@ class ClientAuth {
 
   onAuthRequired(e) {
     console.warn('authentication required')
-    this.route(this.fullpage(this.signinPage), true)
+    window.location.pathname = `/${this.signinPage}`
   }
 
   onActivateRequired(e) {
