@@ -31,13 +31,15 @@ export async function sendPasswordResetEmail({ user, context }) {
 }
 
 export async function resetPassword(token, password) {
-  var { userId } = await getRepository(VerificationToken).findOne({
+  const user = await getRepository(VerificationToken).findOne({
     where: {
       token,
       type: VerificationTokenType.PASSWORD_RESET
     }
   })
 
+  if (!user) return false
+  const { userId } = user
   if (!userId) return false
 
   var userInfo = await getRepository(User).findOne(userId)

@@ -40,7 +40,7 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     'reset-password',
     'unlock-account',
     'activate',
-    'congratulations',
+    'result',
     // apis
     'checkin',
     'profile',
@@ -219,12 +219,12 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     })
   })
 
-  routes.get('/congratulations', async (context, next) => {
+  routes.get('/result', async (context, next) => {
     await context.render('auth-page', {
-      pageElement: 'auth-congratulations',
-      elementScript: '/congratulations.js',
+      pageElement: 'auth-result',
+      elementScript: '/result.js',
       data: {
-        message: 'congratulations'
+        message: 'result'
       }
     })
   })
@@ -430,7 +430,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       var isVerified = await verify(token)
 
       if (isVerified) {
-        context.redirect(`/congratulations`)
+        context.redirect(`/result`)
       } else {
         context.status = 404
         context.body = 'User or verification token not found'
@@ -522,13 +522,21 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
   routes.post('/reset-password', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
-      var { password, token } = context.request.body
-
-      if (!(token || password)) {
+      const { password, token } = context.request.body
+      if (!(token && password)) {
         context.status = 404
+        let message = 'token or password is invalid'
         context.body = {
-          message: 'token or password is invalid'
+          message
         }
+        await context.render('auth-page', {
+          pageElement: 'reset-password',
+          elementScript: '/reset-password.js',
+          data: {
+            token,
+            message
+          }
+        })
         return
       }
 
@@ -545,10 +553,23 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         })
 
         await context.render('auth-page', {
-          pageElement: 'auth-congratulations',
-          elementScript: '/congratulations.js',
+          pageElement: 'auth-result',
+          elementScript: '/result.js',
           data: {
             message: 'password change succeed'
+          }
+        })
+      } else {
+        context.status = 404
+        let message = 'token is invalid'
+        context.body = {
+          message
+        }
+        await context.render('auth-page', {
+          pageElement: 'auth-result',
+          elementScript: '/result.js',
+          data: {
+            message
           }
         })
       }
@@ -582,8 +603,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         })
 
         await context.render('auth-page', {
-          pageElement: 'auth-congratulations',
-          elementScript: '/congratulations.js',
+          pageElement: 'auth-result',
+          elementScript: '/result.js',
           data: {
             message: 'Your account is reactivated'
           }

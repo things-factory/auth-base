@@ -1,9 +1,7 @@
 const DEFAULT_AUTH_REQUIRED_EVENT = 'auth-required'
 const DEFAULT_ACTIVATE_REQUIRED_EVENT = 'activate-required'
-const DEFAULT_DOMAIN_NOT_AVAILABLE_EVENT = 'domain-not-available'
 const DEFAULT_ROUTE_PAGE = ''
 const DEFAULT_CONTEXT_PATH = ''
-const DEFAULT_DOMAIN_SELECT_PAGE = 'domain-select'
 
 const NOOP = () => {}
 
@@ -26,7 +24,6 @@ class ClientAuth {
     contextPath = DEFAULT_CONTEXT_PATH,
     authRequiredEvent = DEFAULT_AUTH_REQUIRED_EVENT,
     activateRequiredEvent = DEFAULT_ACTIVATE_REQUIRED_EVENT,
-    domainNotAvailableEvent = DEFAULT_DOMAIN_NOT_AVAILABLE_EVENT,
     signupPath = 'signup',
     signinPath = 'signin',
     profilePath = 'profile',
@@ -38,7 +35,6 @@ class ClientAuth {
     signupPage = 'signup',
     forgotPasswordPage = 'forgot-password',
     signoutPage,
-    domainSelectPage = DEFAULT_DOMAIN_SELECT_PAGE,
     endpoint = ''
   }) {
     this._event_listeners = {
@@ -46,8 +42,7 @@ class ClientAuth {
       signout: [],
       profile: [],
       changePassword: [],
-      error: [],
-      'domain-not-available': []
+      error: []
     }
 
     this.endpoint = endpoint
@@ -57,7 +52,6 @@ class ClientAuth {
     this.contextPath = contextPath
     this.authRequiredEvent = authRequiredEvent
     this.activateRequiredEvent = activateRequiredEvent
-    this.domainNotAvailableEvent = domainNotAvailableEvent
 
     this.signupPath = signupPath
     this.signinPath = signinPath
@@ -71,7 +65,6 @@ class ClientAuth {
     this.signupPage = signupPage
     this.forgotPasswordPage = forgotPasswordPage
     this.signoutPage = signoutPage
-    this.domainSelectPage = domainSelectPage
   }
 
   on(event, handler) {
@@ -96,7 +89,6 @@ class ClientAuth {
   dispose() {
     this.authRequiredEvent = null
     this.activateRequiredEvent = null
-    this.domainNotAvailableEvent = null
     delete this._event_listeners
   }
 
@@ -171,21 +163,6 @@ class ClientAuth {
       document.addEventListener(this.activateRequiredEvent, this._activateRequiredEventListener)
   }
 
-  get domainNotAvailableEvent() {
-    return this._domainNotAvailableEvent
-  }
-
-  set domainNotAvailableEvent(domainNotAvailableEvent) {
-    this._domainNotAvailableEventListener &&
-      document.removeEventListener(this.domainNotAvailableEvent, this._domainNotAvailableEventListener)
-
-    this._domainNotAvailableEvent = domainNotAvailableEvent
-
-    this._domainNotAvailableEventListener = this.onDomainNotAvailable.bind(this)
-    this.domainNotAvailableEvent &&
-      document.addEventListener(this.domainNotAvailableEvent, this._domainNotAvailableEventListener)
-  }
-
   onSignedIn({ accessToken, domains, redirectTo }) {
     this.accessToken = accessToken
     this.domains = domains
@@ -244,13 +221,6 @@ class ClientAuth {
     window.location.replace(this.fullpage(`${this.activatePage}?email=${e.email}`))
   }
 
-  onDomainNotAvailable(e) {
-    var { redirectTo } = e.detail
-    console.warn('domain not available')
-    this._event_listeners['domain-not-available'].forEach(handler => handler(e))
-    this.route(this.fullpage(redirectTo || this.domainSelectPage))
-  }
-
   route(path, redirected) {
     /* history에 남긴다. redirected된 상태임을 남긴다. */
     const location = window.location
@@ -258,12 +228,6 @@ class ClientAuth {
     const href = `${origin}${path}`
 
     if (location.pathname === path) return
-
-    // 현재 URL이 auth관련 page URL이 아니고, redirect된 경우
-    if (redirected && !this.isAuthPageUrl(location)) {
-      var lastUrl = sessionStorage.getItem('lastUrl')
-      if (!lastUrl) sessionStorage.setItem('lastUrl', location.href)
-    }
 
     // popstate 이벤트가 history.back() 에서만 발생하므로
     // 히스토리에 두번을 넣고 back()을 호출하는 편법을 사용함.
@@ -274,23 +238,6 @@ class ClientAuth {
     window.history.pushState({}, '', href)
 
     window.history.back()
-  }
-
-  isAuthPageUrl(fullurl) {
-    var url = new URL(fullurl)
-    var { pathname } = url
-    var path = pathname.replace(/^\//, '')
-
-    switch (path) {
-      case this.signinPage:
-      case this.signupPage:
-      case this.signoutPage:
-      case this.activatePage:
-      case this.domainSelectPage:
-        return true
-      default:
-        return false
-    }
   }
 }
 
