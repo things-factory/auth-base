@@ -46,6 +46,7 @@ export async function unlockAccount(token, password) {
 
   userInfo.status = UserStatus.ACTIVATED
   userInfo.password = User.encode(password)
+  userInfo.failCount = 0
 
   await getRepository(User).save(userInfo)
   await getRepository(VerificationToken).delete({

@@ -61,22 +61,27 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     return context.redirect('/default-domain')
   })
   domainRouter.get('/domain/:domainName', async (context, next) => {
-    const token = getToken(context)
-    const decodedToken = await User.check(token)
-    const { params } = context
-    const { domainName } = params
+    try {
+      const token = getToken(context)
+      if (!token) return context.redirect('/signin')
+      const decodedToken = await User.check(token)
+      const { params } = context
+      const { domainName } = params
 
-    const user = await getRepository(User).findOne({
-      where: {
-        id: decodedToken.id
-      },
-      relations: ['domain', 'domains']
-    })
+      const user = await getRepository(User).findOne({
+        where: {
+          id: decodedToken.id
+        },
+        relations: ['domain', 'domains']
+      })
 
-    if (!user) return context.redirect('/signin')
-    if (!user.domain || user.domain.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
+      if (!user) return context.redirect('/signin')
+      if (!user.domain || user.domain.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
 
-    return next()
+      return next()
+    } catch (e) {
+      return context.redirect('/signin')
+    }
   })
 
   app.use(domainRouter.routes())
