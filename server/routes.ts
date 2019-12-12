@@ -16,6 +16,7 @@ import { DomainError } from './errors/user-domain-not-match-error'
 import { getToken } from './utils/get-token'
 import { AuthError } from './errors/auth-error'
 import Router from 'koa-router'
+import { unlockAccount } from './controllers/unlock-account'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
@@ -37,6 +38,7 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     'domain-select',
     'forgot-password',
     'reset-password',
+    'unlock-account',
     'activate',
     'congratulations',
     // apis
@@ -190,6 +192,17 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     })
   })
 
+  routes.get('/unlock-account', async (context, next) => {
+    const { token } = context.request.query
+    await context.render('auth-page', {
+      pageElement: 'unlock-account',
+      elementScript: '/unlock-account.js',
+      data: {
+        token
+      }
+    })
+  })
+
   routes.get('/activate/:email', async (context, next) => {
     const { email } = context.params
     await context.render('auth-page', {
@@ -242,7 +255,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     let user = context.request.body
     try {
       const { secure } = context
-      const { user: userInfo, token, domains } = await signin(user)
+      const { user: userInfo, token, domains } = await signin(user, context)
 
       const redirectTo = user.redirect_to || getDefaultDomain(userInfo)
 
@@ -260,22 +273,35 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
       context.redirect(redirectTo)
     } catch (e) {
-      context.status = 401
-      context.body = {
-        message: e.message
+      let message
+      let detail
+
+      switch (e.errorCode) {
+        case AuthError.ERROR_CODES.USER_NOT_ACTIVATED:
+          return context.redirect(`/activate/${user.email}`)
+        case AuthError.ERROR_CODES.USER_NOT_FOUND:
+        case AuthError.ERROR_CODES.PASSWORD_NOT_MATCHED:
+          message = `${AuthError.ERROR_CODES.PASSWORD_NOT_MATCHED}`
+          detail = e.detail
+          break
+        default:
+          message = e.errorCode
+          break
       }
 
-      if (e.errorCode == AuthError.ERROR_CODES.USER_NOT_ACTIVATED) {
-        context.redirect(`/activate/${user.email}`)
-      } else {
-        await context.render('auth-page', {
-          pageElement: 'auth-signin',
-          elementScript: '/signin.js',
-          data: {
-            message: e.message
-          }
-        })
+      context.status = 401
+      context.body = {
+        message
       }
+
+      await context.render('auth-page', {
+        pageElement: 'auth-signin',
+        elementScript: '/signin.js',
+        data: {
+          message,
+          detail
+        }
+      })
     }
   })
 
@@ -518,6 +544,43 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
           elementScript: '/congratulations.js',
           data: {
             message: 'password change succeed'
+          }
+        })
+      }
+    } catch (e) {
+      throw new Error(e)
+    }
+  })
+
+  routes.post('/unlock-account', koaBodyParser(bodyParserOption), async (context, next) => {
+    try {
+      var { password, token } = context.request.body
+
+      if (!(token || password)) {
+        context.status = 404
+        context.body = {
+          message: 'token or password is invalid'
+        }
+        return
+      }
+
+      var succeed = await unlockAccount(token, password)
+
+      if (succeed) {
+        var message = 'password reset succeed'
+        context.body = {
+          message
+        }
+
+        context.cookies.set('access_token', '', {
+          httpOnly: true
+        })
+
+        await context.render('auth-page', {
+          pageElement: 'auth-congratulations',
+          elementScript: '/congratulations.js',
+          data: {
+            message: 'Your account is reactivated'
           }
         })
       }

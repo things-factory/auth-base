@@ -5,7 +5,8 @@ const DATABASE_TYPE = ORMCONFIG.type
 
 export enum VerificationTokenType {
   ACTIVATION = 'activation',
-  PASSWORD_RESET = 'password-reset'
+  PASSWORD_RESET = 'password-reset',
+  UNLOCK = 'unlock'
 }
 
 @Entity('verification_tokens')
