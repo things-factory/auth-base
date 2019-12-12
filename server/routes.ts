@@ -28,6 +28,30 @@ function getDefaultDomain(userInfo, fallbackUrl = '/domain-select') {
   return redirectTo
 }
 
+async function domainCheck(context, next) {
+  try {
+    const token = getToken(context)
+    if (!token) return context.redirect('/signin')
+    const decodedToken = await User.check(token)
+    const { params } = context
+    const { domainName } = params
+
+    const user = await getRepository(User).findOne({
+      where: {
+        id: decodedToken.id
+      },
+      relations: ['domain', 'domains']
+    })
+
+    if (!user) return context.redirect('/signin')
+    if (!user.domain || user.domain.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
+
+    return next()
+  } catch (e) {
+    return context.redirect('/signin')
+  }
+}
+
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
   var paths = [
     // static pages
@@ -61,27 +85,10 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     return context.redirect('/default-domain')
   })
   domainRouter.get('/domain/:domainName', async (context, next) => {
-    try {
-      const token = getToken(context)
-      if (!token) return context.redirect('/signin')
-      const decodedToken = await User.check(token)
-      const { params } = context
-      const { domainName } = params
-
-      const user = await getRepository(User).findOne({
-        where: {
-          id: decodedToken.id
-        },
-        relations: ['domain', 'domains']
-      })
-
-      if (!user) return context.redirect('/signin')
-      if (!user.domain || user.domain.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
-
-      return next()
-    } catch (e) {
-      return context.redirect('/signin')
-    }
+    return await domainCheck(context, next)
+  })
+  domainRouter.get('/domain/:domainName/*', async (context, next) => {
+    return await domainCheck(context, next)
   })
 
   app.use(domainRouter.routes())
