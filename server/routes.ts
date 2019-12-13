@@ -77,6 +77,11 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
 
   const domainRouter = new Router()
 
+  domainRouter.get('*', async (context, next) => {
+    getToken(context)
+    return next()
+  })
+
   domainRouter.get('/', async (context, next) => {
     const token = getToken(context)
     if (!token) return context.redirect('/signin')

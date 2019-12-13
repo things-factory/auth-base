@@ -1,16 +1,19 @@
 export function getToken(context) {
-  const req = context.request
-
-  var token =
-    context.cookies.get('access_token') ||
-    req.headers['x-access-token'] ||
-    req.headers['authorization'] ||
-    req.query.token ||
-    null
+  const { query, headers, secure } = context
+  let searchParamToken = query.token
+  let headerToken = headers['x-access-token'] || headers['authorization']
+  let token = context.cookies.get('access_token') || searchParamToken || headerToken
 
   if (token && token.startsWith('Bearer ')) {
     // Remove Bearer from string
-    return token.slice(7, token.length)
+    token = token.slice(7, token.length)
+  }
+
+  if (searchParamToken || headerToken) {
+    context.cookies.set('access_token', token, {
+      secure,
+      httpOnly: true
+    })
   }
 
   return token

@@ -4,7 +4,7 @@ import { User } from '../entities'
 import { AuthError } from '../errors/auth-error'
 export async function updateProfile(attrs, newProfiles) {
   const repository = getRepository(User)
-  const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain'] })
+  const user = await repository.findOne({ where: { id: attrs.id }, relations: ['domain'] })
   if (!user) {
     throw new AuthError({
       errorCode: USER_NOT_FOUND
