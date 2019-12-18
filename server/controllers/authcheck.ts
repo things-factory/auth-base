@@ -28,7 +28,7 @@ export async function authcheck({ id, domain }) {
     }
 
     // 유저가 접속할 수 있는 도메인이 존재하는지 확인
-    if (!user.domains || !user.domains.length)
+    if (!user?.domains?.length)
       throw new DomainError({
         errorCode: ERROR_CODES.NO_AVAILABLE_DOMAIN,
         domains: []

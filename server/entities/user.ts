@@ -156,7 +156,7 @@ export class User {
         })
       }
     } else {
-      if (!this.domains || this.domains.length == 0)
+      if (!this.domains?.length)
         throw new DomainError({
           errorCode: DomainError.ERROR_CODES.NO_AVAILABLE_DOMAIN,
           domains: []

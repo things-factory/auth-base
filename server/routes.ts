@@ -1,8 +1,8 @@
 import { getPathInfo } from '@things-factory/shell'
 import koaBodyParser from 'koa-bodyparser'
+import Router from 'koa-router'
 import { getRepository } from 'typeorm'
 import { URL } from 'url'
-import { authcheck } from './controllers/authcheck'
 import { changePwd } from './controllers/change-pwd'
 import { checkin } from './controllers/checkin'
 import { deleteAccount } from './controllers/delete-account'
@@ -10,19 +10,16 @@ import { updateProfile } from './controllers/profile'
 import { resetPassword, sendPasswordResetEmail } from './controllers/reset-password'
 import { signin } from './controllers/signin'
 import { signup } from './controllers/signup'
+import { unlockAccount } from './controllers/unlock-account'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
-import { DomainError } from './errors/user-domain-not-match-error'
-import { getToken } from './utils/get-token'
 import { AuthError } from './errors/auth-error'
-import Router from 'koa-router'
-import { unlockAccount } from './controllers/unlock-account'
+import { getToken } from './utils/get-token'
 
 const MAX_AGE = 7 * 24 * 3600 * 1000
 
 function getDefaultDomain(userInfo, fallbackUrl = '/domain-select') {
   let redirectTo = fallbackUrl
-  // if (userInfo.domain) redirectTo = `/domain/${userInfo.domain.subdomain}`
   if (userInfo.domain) redirectTo = `/checkin/${userInfo.domain.subdomain}`
 
   return redirectTo
@@ -50,7 +47,7 @@ async function domainCheck(context, next) {
       throw new AuthError({
         errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND
       })
-    if (!user.domain || user.domain.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
+    if (user?.domain?.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
 
     return next()
   } catch (e) {
@@ -303,13 +300,14 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       switch (e.errorCode) {
         case AuthError.ERROR_CODES.USER_NOT_ACTIVATED:
           return context.redirect(`/activate/${user.email}`)
-        case AuthError.ERROR_CODES.USER_NOT_FOUND:
-        case AuthError.ERROR_CODES.PASSWORD_NOT_MATCHED:
-          message = `${AuthError.ERROR_CODES.PASSWORD_NOT_MATCHED}`
-          detail = e.detail
-          break
+        // case AuthError.ERROR_CODES.USER_NOT_FOUND:
+        // case AuthError.ERROR_CODES.PASSWORD_NOT_MATCHED:
+        //   message = `${AuthError.ERROR_CODES.PASSWORD_NOT_MATCHED}`
+        //   detail = e.detail
+        //   break
         default:
           message = e.errorCode
+          detail = e.detail
           break
       }
 
