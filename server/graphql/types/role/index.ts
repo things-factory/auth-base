@@ -11,16 +11,16 @@ export const Mutation = `
   ): Role @priviledge(category: "user", priviledge: "mutation")
 
   updateRole (
-    name: String!
+    id: String!
     patch: RolePatch!
   ): Role @priviledge(category: "user", priviledge: "mutation")
 
   deleteRole (
-    name: String!
+    id: String!
   ): Boolean @priviledge(category: "user", priviledge: "mutation")
 
   deleteRoles (
-    names: [String]!
+    ids: [String]!
   ): Boolean @priviledge(category: "user", priviledge: "mutation")
 `
 

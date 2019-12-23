@@ -2,10 +2,10 @@ import { getRepository } from 'typeorm'
 import { Priviledge, Role } from '../../../entities'
 
 export const updateRole = {
-  async updateRole(_: any, { name, patch }, context: any) {
+  async updateRole(_: any, { id, patch }, context: any) {
     const repository = getRepository(Role)
     const role = await repository.findOne({
-      where: { domain: context.state.domain, name },
+      where: { id },
       relations: ['domain', 'priviledges', 'creator', 'updater']
     })
 
