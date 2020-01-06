@@ -1,15 +1,16 @@
 {
-  "field.email": "email address",
-  "field.password": "password",
-  "field.token": "token",
+  "field.active": "active",
   "field.appliance_id": "appliance id",
   "field.brand": "brand",
-  "field.model": "model",
-  "field.active": "active",
   "field.category": "category",
-  "field.roles": "roles",
+  "field.email": "email address",
+  "field.model": "model",
+  "field.password": "password",
   "field.priviledges": "priviledges",
+  "field.roles": "roles",
+  "field.token": "token",
   "field.user": "user",
+  "field.user_account": "user account",
   "field.user_type": "user type",
-  "field.user_account": "user account"
+  "text.verification email resent": "The verification email has been successfully resent."
 }

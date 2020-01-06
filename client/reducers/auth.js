@@ -1,7 +1,6 @@
-import { SET_AUTH, SET_PROFILE, SET_LOCALE } from '../actions/auth.js'
+import { SET_AUTH, SET_PROFILE } from '../actions/auth.js'
 
 const INITIAL_STATE = {
-  locale: 'en-US',
   authenticated: false,
   accessToken: '',
   user: null
@@ -9,12 +8,6 @@ const INITIAL_STATE = {
 
 const auth = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case SET_LOCALE:
-      return {
-        ...state,
-        locale: action.locale || 'en-US'
-      }
-
     case SET_AUTH:
       let auth = action.auth
 

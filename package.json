@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-base",
-  "version": "0.9.0",
+  "version": "1.0.0-alpha.40",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -23,10 +23,12 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
-    "@things-factory/shell": "^0.9.0",
+    "@things-factory/email-base": "^1.0.0-alpha.1",
+    "@things-factory/shell": "^1.0.0-alpha.1",
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
-    "@things-factory/tester": "*"
+    "@things-factory/board-app": "^1.0.0-alpha.7",
+    "@things-factory/board-test": "^1.0.0-alpha.3"
   }
 }

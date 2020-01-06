@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-koa'
+import gql from 'graphql-tag'
 
 export const User = gql`
   type User {
@@ -11,6 +11,7 @@ export const User = gql`
     userType: String
     domain: Domain
     domains: [Domain]
+    locale: String
     creator: User
     updater: User
     createdAt: String

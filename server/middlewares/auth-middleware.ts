@@ -1,40 +1,33 @@
-import { User } from '../entities'
+import { getPathInfo } from '@things-factory/shell'
 import unless from 'koa-unless'
+import { URL } from 'url'
+import { User } from '../entities'
+import { getToken } from '../utils/get-token'
 ;(authMiddleware as any).unless = unless
-
-function getToken(context) {
-  const req = context.request
-
-  var token =
-    context.cookies.get('access_token') ||
-    req.headers['x-access-token'] ||
-    req.headers['authorization'] ||
-    req.query.token ||
-    null
-
-  if (token && token.startsWith('Bearer ')) {
-    // Remove Bearer from string
-    return token.slice(7, token.length)
-  }
-
-  context.state.token = token
-
-  return token
-}
 
 export async function authMiddleware(context, next) {
   try {
-    var token = getToken(context)
+    const { request } = context
+    const { originalUrl, header } = request
+    const { referer } = header
+
+    // const ref = referer ? new URL(referer) : originalUrl
+
+    const { contextPath, domain } = getPathInfo(originalUrl)
+    const token = getToken(context)
+    context.state.token = token
 
     if (!token) {
       throw Error('not signed in')
     }
 
-    context.state.user = await User.check(token)
+    var decodedToken = await User.check(token)
+    context.state.user = decodedToken
 
     return next()
   } catch (e) {
-    context.status = 401
+    let status = 401
+    context.status = status
     context.body = {
       success: false,
       message: e.message

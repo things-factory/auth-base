@@ -1,9 +1,9 @@
-import { getRepository } from 'typeorm'
-import { User } from '../../../entities'
+import { deleteAccount } from '../../../controllers/delete-account'
 
 export const deleteUser = {
   async deleteUser(_: any, { email }, context: any) {
-    await getRepository(User).delete({ email })
+    await deleteAccount({ email })
+
     return true
   }
 }

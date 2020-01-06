@@ -1,4 +1,5 @@
 const DEFAULT_AUTH_REQUIRED_EVENT = 'auth-required'
+const DEFAULT_ACTIVATE_REQUIRED_EVENT = 'activate-required'
 const DEFAULT_ROUTE_PAGE = ''
 const DEFAULT_CONTEXT_PATH = ''
 
@@ -22,12 +23,17 @@ class ClientAuth {
     defaultRoutePage = DEFAULT_ROUTE_PAGE,
     contextPath = DEFAULT_CONTEXT_PATH,
     authRequiredEvent = DEFAULT_AUTH_REQUIRED_EVENT,
+    activateRequiredEvent = DEFAULT_ACTIVATE_REQUIRED_EVENT,
     signupPath = 'signup',
     signinPath = 'signin',
-    profilePath = 'authcheck',
+    profilePath = 'profile',
+    updateProfilePath = 'update-profile',
+    changepassPath = 'change_pass',
+    deleteAccountPath = 'delete-account',
+    activatePage = 'activate',
     signinPage = 'signin',
     signupPage = 'signup',
-    changepassPath = 'change_pass',
+    forgotPasswordPage = 'forgot-password',
     signoutPage,
     endpoint = ''
   }) {
@@ -45,15 +51,20 @@ class ClientAuth {
     this.defaultRoutePage = defaultRoutePage
     this.contextPath = contextPath
     this.authRequiredEvent = authRequiredEvent
+    this.activateRequiredEvent = activateRequiredEvent
 
     this.signupPath = signupPath
     this.signinPath = signinPath
     this.profilePath = profilePath
+    this.changepassPath = changepassPath
+    this.updateProfilePath = updateProfilePath
+    this.deleteAccountPath = deleteAccountPath
 
+    this.activatePage = activatePage
     this.signinPage = signinPage
     this.signupPage = signupPage
+    this.forgotPasswordPage = forgotPasswordPage
     this.signoutPage = signoutPage
-    this.changepassPath = changepassPath
   }
 
   on(event, handler) {
@@ -77,6 +88,7 @@ class ClientAuth {
 
   dispose() {
     this.authRequiredEvent = null
+    this.activateRequiredEvent = null
     delete this._event_listeners
   }
 
@@ -99,7 +111,7 @@ class ClientAuth {
   fullpage(relativePath) {
     return (
       '/' +
-      [this.contextPath, relativePath]
+      [relativePath]
         .filter(path => path && path !== '/')
         .map(path => (path.startsWith('/') ? path.substr(1) : path))
         .map(path => (path.endsWith('/') ? path.substr(0, path.length - 1) : path))
@@ -115,6 +127,8 @@ class ClientAuth {
       this.signout = provider.signout.bind(this)
       this.profile = provider.profile.bind(this)
       this.changePassword = provider.changePassword.bind(this)
+      this.updateProfile = provider.updateProfile.bind(this)
+      this.deleteAccount = provider.deleteAccount.bind(this)
     } else {
       this.signup = this.signin = this.signout = this.profile = NOOP
     }
@@ -134,47 +148,49 @@ class ClientAuth {
     this.authRequiredEvent && document.addEventListener(this.authRequiredEvent, this._authRequiredEventListener)
   }
 
-  onSignedIn(accessToken) {
-    this.accessToken = accessToken
-
-    this._event_listeners.signin.forEach(handler => handler(accessToken))
-
-    let state = window.history.state
-
-    if (!state || !('redirected' in state)) {
-      /* signin/signup page에 직접(주소창 입력, 링크) 들어온 경우 */
-      this.route(this.fullpage(this.defaultRoutePage), false)
-    } else {
-      /* 인증 프로세스를 통해서 들어온 경우 */
-      if (state.redirected) {
-        /* authRequired를 통해서 들어온 경우 */
-        window.history.back()
-      } else {
-        /* signout을 통해서 들어온 경우 */
-        this.route(this.fullpage(this.defaultRoutePage), false)
-      }
-    }
+  get activateRequiredEvent() {
+    return this._activateRequiredEvent
   }
 
-  onProfileFetched(credential, accessToken) {
+  set activateRequiredEvent(activateRequiredEvent) {
+    this._activateRequiredEventListener &&
+      document.removeEventListener(this.activateRequiredEvent, this._activateRequiredEventListener)
+
+    this._activateRequiredEvent = activateRequiredEvent
+
+    this._activateRequiredEventListener = this.onActivateRequired.bind(this)
+    this.activateRequiredEvent &&
+      document.addEventListener(this.activateRequiredEvent, this._activateRequiredEventListener)
+  }
+
+  onSignedIn({ accessToken, domains, redirectTo }) {
+    this.accessToken = accessToken
+    this.domains = domains
+
+    this._event_listeners.signin.forEach(handler => handler({ accessToken, domains }))
+  }
+
+  onProfileFetched({ credential, accessToken, domains }) {
     this.credential = credential
+    this.domains = domains
     if (accessToken && !this.accessToken) {
-      /* 
+      /*
       기존에 세션을 가지거나, 액세스토큰으로 인증된 경우,
       이 경우는 signin 이벤트리스너들을 호출해서 authenticated 상태로 되도록 유도한다.
       */
       this.accessToken = accessToken
-      this._event_listeners.signin.forEach(handler => handler(accessToken))
+      this._event_listeners.signin.forEach(handler => handler({ accessToken, domains }))
     }
     accessToken && (this.accessToken = accessToken)
-    this._event_listeners.profile.forEach(handler => handler(credential))
+    this._event_listeners.profile.forEach(handler => handler({ credential, domains }))
   }
 
   onSignedOut() {
     this.credential = null
+    this.domains = []
     this._event_listeners.signout.forEach(handler => handler())
 
-    this.route(this.fullpage(this.signoutPage ? this.signoutPage : this.signinPage), false)
+    window.location.replace(`/${this.signoutPage ? this.signoutPage : this.signinPage}`)
   }
 
   onAuthError(error) {
@@ -194,7 +210,15 @@ class ClientAuth {
 
   onAuthRequired(e) {
     console.warn('authentication required')
-    this.route(this.fullpage(this.signinPage), true)
+    let url = new URL(window.location)
+    url.pathname = this.signinPage
+    url.searchParams.append('redirect_to', window.location.href)
+    window.location = url
+  }
+
+  onActivateRequired(e) {
+    console.warn('activate required')
+    window.location.replace(this.fullpage(`${this.activatePage}?email=${e.email}`))
   }
 
   route(path, redirected) {

@@ -1,13 +1,9 @@
-import { getRepository, In } from 'typeorm'
+import { getRepository } from 'typeorm'
 import { Role } from '../../../entities'
 
 export const deleteRoles = {
-  async deleteRoles(_: any, { names }, context: any) {
-    await getRepository(Role).delete({
-      domain: context.state.domain,
-      name: In(names)
-    })
-
+  async deleteRoles(_: any, { ids }, _context: any) {
+    await getRepository(Role).delete(ids)
     return true
   }
 }
