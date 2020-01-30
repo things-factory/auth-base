@@ -1,4 +1,4 @@
-import { getPathInfo } from '@things-factory/shell'
+import { getPathInfo } from '@things-factory/utils'
 import unless from 'koa-unless'
 import { URL } from 'url'
 import { User } from '../entities'
