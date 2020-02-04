@@ -3,6 +3,8 @@ import koaBodyParser from 'koa-bodyparser'
 import Router from 'koa-router'
 import { getRepository } from 'typeorm'
 import { URL } from 'url'
+import { SIGNIN_PATH } from './constants/path'
+import { TOKEN_EXPIRES_IN } from './constants/token-expires-in'
 import { changePwd } from './controllers/change-pwd'
 import { checkin } from './controllers/checkin'
 import { deleteAccount } from './controllers/delete-account'
@@ -14,9 +16,10 @@ import { unlockAccount } from './controllers/unlock-account'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
 import { AuthError } from './errors/auth-error'
-import { getToken } from './utils/get-token'
+import { getTokens } from './utils/get-token'
+import { deleteRefreshToken } from './controllers/refresh-token'
 
-const MAX_AGE = 7 * 24 * 3600 * 1000
+const MAX_AGE = 30 * 24 * 3600 * 1000
 
 function getDefaultDomain(userInfo, fallbackUrl = '/domain-select') {
   let redirectTo = fallbackUrl
@@ -27,12 +30,15 @@ function getDefaultDomain(userInfo, fallbackUrl = '/domain-select') {
 
 async function domainCheck(context, next) {
   try {
-    const token = getToken(context)
-    if (!token)
+    const tokens = getTokens(context)
+    if (!tokens)
       throw new AuthError({
         errorCode: AuthError.ERROR_CODES.TOKEN_INVALID
       })
-    const decodedToken = await User.check(token)
+    const decodedToken = await User.checkAndRefresh({
+      context,
+      tokens
+    })
     const { params } = context
     const { domainName } = params
 
@@ -52,14 +58,14 @@ async function domainCheck(context, next) {
     return next()
   } catch (e) {
     const { originalUrl } = context
-    return context.redirect(`/signin?redirect_to=${originalUrl}`)
+    return context.redirect(`/${SIGNIN_PATH}?redirect_to=${originalUrl}`)
   }
 }
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
   var paths = [
     // static pages
-    'signin',
+    SIGNIN_PATH,
     'signup',
     'signout',
     'default-domain',
@@ -82,16 +88,23 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
   const domainRouter = new Router()
 
   domainRouter.get('*', async (context, next) => {
-    getToken(context)
+    getTokens(context)
     return next()
   })
 
   domainRouter.get('/', async (context, next) => {
-    const token = getToken(context)
-    if (!token) return context.redirect('/signin')
-    const decodedToken = await User.check(token)
-    if (!decodedToken) return context.redirect('/signin')
-    return context.redirect('/default-domain')
+    try {
+      const tokens = getTokens(context)
+      if (!tokens) return context.redirect(`/${SIGNIN_PATH}`)
+      const decodedToken = await User.checkAndRefresh({
+        context,
+        tokens
+      })
+      if (!decodedToken) return context.redirect(`/${SIGNIN_PATH}`)
+      return context.redirect('/default-domain')
+    } catch (e) {
+      return context.redirect(`/${SIGNIN_PATH}`)
+    }
   })
   domainRouter.get('/domain/:domainName', async (context, next) => {
     return await domainCheck(context, next)
@@ -111,13 +124,14 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   }
 
   // static pages
-  routes.get('/signin', async (context, next) => {
+  routes.get(`/${SIGNIN_PATH}`, async (context, next) => {
     try {
       const { query } = context
       const { redirect_to } = query
       // check signed in
-      const token = getToken(context)
-      if (!token)
+      const tokens = getTokens(context)
+      const { accessToken, refreshToken } = tokens
+      if (!refreshToken) {
         return await context.render('auth-page', {
           pageElement: 'auth-signin',
           elementScript: '/signin.js',
@@ -125,8 +139,13 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
             redirectTo: redirect_to
           }
         })
+      }
 
-      const user = await User.check(token)
+      const user = await User.checkAndRefresh({
+        context,
+        tokens
+      })
+
       const redirectTo = getDefaultDomain(user)
 
       context.redirect(redirectTo)
@@ -148,22 +167,36 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   })
 
   routes.get('/signout', async (context, next) => {
-    context.body = {
-      message: 'signout successfully'
+    let tokens
+    try {
+      tokens = getTokens(context)
+      await deleteRefreshToken(tokens.refreshToken)
+    } catch (e) {
+    } finally {
+      context.body = {
+        message: 'signout successfully'
+      }
+
+      context.cookies.set('access_token', '', {
+        httpOnly: true
+      })
+
+      context.cookies.set('refresh_token', '', {
+        httpOnly: true
+      })
+
+      return context.redirect('/')
     }
-
-    context.cookies.set('access_token', '', {
-      httpOnly: true
-    })
-
-    context.redirect('/')
   })
 
   routes.get('/default-domain', async (context, next) => {
-    const token = getToken(context)
-    if (!token) return context.redirect('/signin')
-    const user = await User.check(token)
-    if (!user) return context.redirect('/signin')
+    const tokens = getTokens(context)
+    if (!tokens) return context.redirect(`/${SIGNIN_PATH}`)
+    const user = await User.checkAndRefresh({
+      context,
+      tokens
+    })
+    if (!user) return context.redirect(`/${SIGNIN_PATH}`)
 
     if (!user.domain) return context.redirect('/domain-select')
     return context.redirect(`/domain/${user.domain.subdomain}`)
@@ -172,10 +205,13 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   routes.get('/domain-select', async (context, next) => {
     const { secure } = context
     try {
-      const token = getToken(context)
-      if (!token) return context.redirect('/signin')
-      const user = await User.check(token)
-      if (!user) return context.redirect('/signin')
+      const tokens = getTokens(context)
+      if (!tokens) return context.redirect(`/${SIGNIN_PATH}`)
+      const user = await User.checkAndRefresh({
+        context,
+        tokens
+      })
+      if (!user) return context.redirect(`/${SIGNIN_PATH}`)
       const { domains } = await User.checkAuth(user)
 
       await context.render('auth-page', {
@@ -188,9 +224,10 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     } catch (e) {
       context.cookies.set('access_token', '', {
         secure,
-        httpOnly: true
+        httpOnly: true,
+        maxAge: TOKEN_EXPIRES_IN
       })
-      context.redirect('/signin')
+      context.redirect(`/${SIGNIN_PATH}`)
     }
   })
 
@@ -260,7 +297,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
         context.cookies.set('access_token', newToken, {
           secure,
           httpOnly: true,
-          maxAge: MAX_AGE
+          maxAge: TOKEN_EXPIRES_IN
         })
         context.redirect(`/domain/${domainName}`)
       } else {
@@ -272,21 +309,27 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   })
 
   // for authentication
-  routes.post('/signin', koaBodyParser(bodyParserOption), async (context, next) => {
+  routes.post(`/${SIGNIN_PATH}`, koaBodyParser(bodyParserOption), async (context, next) => {
     let user = context.request.body
     try {
       const { secure } = context
-      const { user: userInfo, token, domains } = await signin(user, context)
+      const { user: userInfo, tokens, domains } = await signin(user, context)
 
       const redirectTo = user.redirect_to || getDefaultDomain(userInfo)
 
       let responseObj = {
         message: 'signin successfully',
-        token,
+        tokens,
         domains
       }
 
-      context.cookies.set('access_token', token, {
+      context.cookies.set('access_token', tokens.accessToken, {
+        secure,
+        httpOnly: true,
+        maxAge: TOKEN_EXPIRES_IN
+      })
+
+      context.cookies.set('refresh_token', tokens.refreshToken, {
         secure,
         httpOnly: true,
         maxAge: MAX_AGE
@@ -329,7 +372,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
   routes.post('/signup', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
-      let user = context.request.body
+      const { secure, request } = context
+      let user = request.body
       let { token } = await signup(
         {
           ...user,
@@ -344,8 +388,9 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       }
 
       context.cookies.set('access_token', token, {
+        secure,
         httpOnly: true,
-        maxAge: MAX_AGE
+        maxAge: TOKEN_EXPIRES_IN
       })
 
       context.redirect(`/activate/${user.email}`)
@@ -366,18 +411,22 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
   })
 
   routes.post('/signout', koaBodyParser(bodyParserOption), async (context, next) => {
+    let tokens
     try {
-      context.body = {
-        message: 'signout successfully'
-      }
-
+      tokens = getTokens(context)
+      await deleteRefreshToken(tokens.refreshToken)
+    } catch (e) {
+    } finally {
       context.cookies.set('access_token', '', {
         httpOnly: true
       })
-    } catch (e) {
-      context.status = 401
+
+      context.cookies.set('refresh_token', '', {
+        httpOnly: true
+      })
+
       context.body = {
-        message: e.message
+        message: 'signout successfully'
       }
     }
   })
@@ -424,7 +473,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
 
   routes.post('/change_pass', koaBodyParser(bodyParserOption), async (context, next) => {
     try {
-      let newPassword = context.request.body.new_pass
+      const { secure, request } = context
+      let newPassword = request.body.new_pass
       const token = await changePwd(context.state.user, newPassword)
 
       context.body = {
@@ -433,8 +483,9 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       }
 
       context.cookies.set('access_token', token, {
+        secure,
         httpOnly: true,
-        maxAge: MAX_AGE
+        maxAge: TOKEN_EXPIRES_IN
       })
     } catch (e) {
       throw new Error(e)
@@ -451,7 +502,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       } else {
         context.status = 404
         context.body = 'User or verification token not found'
-        context.redirect('/signin')
+        context.redirect(`/${SIGNIN_PATH}`)
       }
     } catch (e) {
       throw new Error(e)

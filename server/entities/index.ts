@@ -4,9 +4,10 @@ import { Role } from './role'
 import { PermitUrl } from './permit-url'
 import { Priviledge } from './priviledge'
 import { Appliance } from './appliance'
+import { UsersTokens } from './users-tokens'
 import { VerificationToken, VerificationTokenType } from './verification-token'
 
-export const entities = [User, UserHistory, Role, PermitUrl, Priviledge, Appliance, VerificationToken]
+export const entities = [User, UserHistory, Role, PermitUrl, Priviledge, Appliance, UsersTokens, VerificationToken]
 export {
   User,
   UserStatus,
@@ -15,6 +16,7 @@ export {
   PermitUrl,
   Priviledge,
   Appliance,
+  UsersTokens,
   VerificationToken,
   VerificationTokenType
 }

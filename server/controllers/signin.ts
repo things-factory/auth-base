@@ -2,9 +2,14 @@ import { getRepository } from 'typeorm'
 import { User, UserStatus } from '../entities'
 import { AuthError } from '../errors/auth-error'
 import { sendUnlockAccountEmail } from '../controllers/unlock-account'
+import { createRefreshToken } from '../controllers/refresh-token'
+import { makeRefreshToken } from './utils/make-refresh-token'
+import { UsersTokens } from '../entities/users-tokens'
 export async function signin(attrs, context?) {
-  const repository = getRepository(User)
-  const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain', 'domains'] })
+  const userRepo = getRepository(User)
+  const usersTokensRepo = getRepository(UsersTokens)
+  const user = await userRepo.findOne({ where: { email: attrs.email }, relations: ['domain', 'domains'] })
+  var refreshToken
   if (!user)
     throw new AuthError({
       errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND
@@ -29,7 +34,7 @@ export async function signin(attrs, context?) {
   if (!user.verify(attrs.password)) {
     user.failCount++
     if (user.failCount >= 5) user.status = UserStatus.LOCKED
-    await repository.save(user)
+    await userRepo.save(user)
     if (user.status == UserStatus.LOCKED) {
       sendUnlockAccountEmail({
         user,
@@ -47,7 +52,8 @@ export async function signin(attrs, context?) {
     })
   } else {
     user.failCount = 0
-    await repository.save(user)
+    await userRepo.save(user)
+    refreshToken = await createRefreshToken(user)
   }
 
   if (user.status == UserStatus.INACTIVE) {
@@ -58,7 +64,10 @@ export async function signin(attrs, context?) {
 
   return {
     user,
-    token: await user.sign(),
+    tokens: {
+      accessToken: await user.sign(),
+      refreshToken
+    },
     domains: user.domains || []
   }
 }

@@ -1,27 +1,21 @@
-import { getPathInfo } from '@things-factory/shell'
 import unless from 'koa-unless'
-import { URL } from 'url'
 import { User } from '../entities'
-import { getToken } from '../utils/get-token'
+import { getTokens } from '../utils/get-token'
 ;(authMiddleware as any).unless = unless
 
 export async function authMiddleware(context, next) {
   try {
-    const { request } = context
-    const { originalUrl, header } = request
-    const { referer } = header
+    const tokens = getTokens(context)
+    context.state.token = tokens
 
-    // const ref = referer ? new URL(referer) : originalUrl
-
-    const { contextPath, domain } = getPathInfo(originalUrl)
-    const token = getToken(context)
-    context.state.token = token
-
-    if (!token) {
+    if (!tokens) {
       throw Error('not signed in')
     }
 
-    var decodedToken = await User.check(token)
+    var decodedToken = await User.checkAndRefresh({
+      context,
+      tokens
+    })
     context.state.user = decodedToken
 
     return next()

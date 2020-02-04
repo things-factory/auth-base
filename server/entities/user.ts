@@ -2,6 +2,7 @@ import { config } from '@things-factory/env'
 import { Domain } from '@things-factory/shell'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
+import { extendRefreshToken } from '../controllers/refresh-token'
 import {
   Column,
   CreateDateColumn,
@@ -14,6 +15,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
+import { TOKEN_EXPIRES_IN } from '../constants/token-expires-in'
 import { AuthError } from '../errors/auth-error'
 import { DomainError } from '../errors/user-domain-not-match-error'
 import { Role } from './role'
@@ -118,7 +120,7 @@ export class User {
     }
 
     return await jwt.sign(user, SECRET, {
-      expiresIn: '7d',
+      expiresIn: `${TOKEN_EXPIRES_IN}ms`,
       issuer: 'hatiolab.com',
       subject: 'user'
     })
@@ -183,6 +185,30 @@ export class User {
   /* verify jsonwebtoken */
   static async check(token: string) {
     var decoded = await jwt.verify(token, SECRET)
+    return decoded
+  }
+
+  static async refresh(context, token) {
+    const { secure } = context
+    const tokens = await extendRefreshToken(token)
+
+    context.cookies.set('access_token', tokens.accessToken, {
+      secure,
+      httpOnly: true,
+      maxAge: TOKEN_EXPIRES_IN
+    })
+
+    return tokens
+  }
+
+  static async checkAndRefresh({ context, tokens }) {
+    var decoded
+    try {
+      decoded = await User.check(tokens.accessToken)
+    } catch (e) {
+      var { accessToken, refreshToken } = await User.refresh(context, tokens.refreshToken)
+      decoded = await User.check(accessToken)
+    }
 
     return decoded
   }
