@@ -27,27 +27,28 @@ export async function authcheck({ id, domain }) {
         })
     }
 
+    let domains = await user.domains
     // 유저가 접속할 수 있는 도메인이 존재하는지 확인
-    if (!user?.domains?.length)
+    if (!domains.length)
       throw new DomainError({
         errorCode: ERROR_CODES.NO_AVAILABLE_DOMAIN,
         domains: []
       })
   }
 
-  var domains = user.domains
+  let domains = await user.domains
   // 접속한 URL과 일치하는 도메인이 존재하는지 확인
   if (!domain)
     throw new DomainError({
       errorCode: ERROR_CODES.NO_SELECTED_DOMAIN,
-      domains: domains
+      domains
     })
 
   var foundDomain = domains.find(d => d.subdomain == domain)
   if (!foundDomain)
     throw new DomainError({
       errorCode: ERROR_CODES.UNAVAILABLE_DOMAIN,
-      domains: domains
+      domains
     })
   else {
     user.domain = foundDomain

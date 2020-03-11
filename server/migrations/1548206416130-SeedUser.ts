@@ -23,7 +23,6 @@ export class SeedUsers1525758367829 implements MigrationInterface {
         const user = SEED_USERS[i]
         await repository.save({
           // domain, /* domain은 사용자 생성시 설정될 필요 없음 */
-          domains,
           ...user,
           password: User.encode(user.password)
         })
