@@ -41,15 +41,15 @@ export async function jwtAuthenticateMiddleware(context, next) {
         if (err || !user) {
           const error = new Error('Not authorized')
 
-          // if (context.header['sec-fetch-mode'] != 'navigate') {
-          //   context.status = 401
-          //   context.body = {
-          //     success: false,
-          //     message: error.message
-          //   }
+          if (context.header['sec-fetch-mode'] != 'navigate') {
+            context.status = 401
+            context.body = {
+              success: false,
+              message: error.message
+            }
 
-          //   return resolve(context)
-          // }
+            return resolve(context)
+          }
 
           return resolve(next(error))
         }
