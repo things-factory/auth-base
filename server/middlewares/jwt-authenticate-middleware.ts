@@ -34,39 +34,23 @@ passport.use(
 )
 
 export async function jwtAuthenticateMiddleware(context, next) {
-  return new Promise((resolve, reject) => {
-    const { request: req, response: res, secure } = context
-    passport.authenticate('jwt', async (err, user, info) => {
-      try {
-        if (err || !user) {
-          const error = new Error('Not authorized')
+  return passport.authenticate('jwt', { session: false }, async (err, user, info) => {
+    if (err || !user) {
+      const error = new Error('Not authorized')
 
-          if (context.header['sec-fetch-mode'] != 'navigate') {
-            context.status = 401
-            context.body = {
-              success: false,
-              message: error.message
-            }
-
-            return resolve(context)
-          }
-
-          return resolve(next(error))
-        }
-
-        const userEntity = await User.checkAuth(user)
-
-        context.state.user = userEntity
-
-        resolve(
-          next({
-            user,
-            info
-          })
-        )
-      } catch (error) {
-        return resolve(next(error))
+      if (context.header['sec-fetch-mode'] && context.header['sec-fetch-mode'] != 'navigate') {
+        context.throw(401, {
+          success: false,
+          message: error.message
+        })
       }
-    })(req, res, next)
-  })
+
+      await next()
+    } else {
+      const userEntity = await User.checkAuth(user)
+
+      context.state.user = userEntity
+      await next()
+    }
+  })(context, next)
 }

@@ -35,37 +35,39 @@ passport.use(
 )
 
 export async function signinMiddleware(context, next) {
-  return new Promise((resolve, reject) => {
-    const { request: req, response: res, secure } = context
-    passport.authenticate('signin', async (err, user, info) => {
-      try {
-        if (err || !user) {
-          const error = new Error('An Error occurred')
-          return reject(next(error))
-        }
+  return passport.authenticate('signin', { session: false }, async (err, user, info) => {
+    if (err || !user) {
+      const error = new Error('Not authorized')
 
-        const reqBody = req.body
-        const { user: userInfo, token, domains } = user
-
-        const redirectTo = reqBody.redirect_to || (await getDefaultDomain(userInfo))
-
-        let responseObj = {
-          message: 'signin successfully',
-          token,
-          domains
-        }
-
-        context.cookies.set('access_token', token, {
-          secure,
-          httpOnly: true,
-          maxAge: MAX_AGE
+      if (context.header['sec-fetch-mode'] && context.header['sec-fetch-mode'] != 'navigate') {
+        context.throw(401, {
+          success: false,
+          message: error.message
         })
-
-        context.redirect(redirectTo)
-        resolve(next())
-      } catch (error) {
-        return next(error)
       }
-    })(req, res, next)
-  })
+
+      await next()
+    } else {
+    }
+
+    const reqBody = context.request.body
+    const { secure } = context
+    const { user: userInfo, token, domains } = user
+
+    const redirectTo = reqBody.redirect_to || (await getDefaultDomain(userInfo))
+
+    let responseObj = {
+      message: 'signin successfully',
+      token,
+      domains
+    }
+
+    context.cookies.set('access_token', token, {
+      secure,
+      httpOnly: true,
+      maxAge: MAX_AGE
+    })
+
+    context.redirect(redirectTo)
+  })(context, next)
 }

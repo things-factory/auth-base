@@ -1,52 +1,15 @@
 import { config } from '@things-factory/env'
 import koaBodyParser from 'koa-bodyparser'
-import Router from 'koa-router'
 import { getRepository } from 'typeorm'
-
 import { MAX_AGE } from './constants/max-age'
 import { resetPassword, sendPasswordResetEmail } from './controllers/reset-password'
 import { signup } from './controllers/signup'
 import { unlockAccount } from './controllers/unlock-account'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
-import { AuthError } from './errors/auth-error'
-import { secureRouter, signinRouter } from './router'
-import { getToken } from './utils/get-token'
+import { domainRouter, secureRouter, signinRouter } from './router'
 
 const SECRET = config.get('SECRET', '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95')
-
-async function domainCheck(context, next) {
-  try {
-    const token = getToken(context)
-    if (!token)
-      throw new AuthError({
-        errorCode: AuthError.ERROR_CODES.TOKEN_INVALID
-      })
-    const decodedToken = await User.check(token)
-    const { params } = context
-    const { domainName } = params
-
-    const user = await getRepository(User).findOne({
-      where: {
-        id: decodedToken.id
-      },
-      relations: ['domain', 'domains']
-    })
-
-    if (!user)
-      throw new AuthError({
-        errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND
-      })
-
-    const userDomain = await user?.domain
-    if (userDomain?.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
-
-    return next()
-  } catch (e) {
-    const { originalUrl } = context
-    return context.redirect(`/signin?redirect_to=${originalUrl}`)
-  }
-}
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
   var paths = [
@@ -70,27 +33,6 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     // 'domain'
   ]
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
-
-  const domainRouter = new Router()
-
-  domainRouter.get('*', async (context, next) => {
-    getToken(context)
-    return next()
-  })
-
-  domainRouter.get('/', async (context, next) => {
-    const token = getToken(context)
-    if (!token) return context.redirect('/signin')
-    const decodedToken = await User.check(token)
-    if (!decodedToken) return context.redirect('/signin')
-    return context.redirect('/default-domain')
-  })
-  domainRouter.get('/domain/:domainName', async (context, next) => {
-    return await domainCheck(context, next)
-  })
-  domainRouter.get('/domain/:domainName/*', async (context, next) => {
-    return await domainCheck(context, next)
-  })
 
   app.use(domainRouter.routes())
 })
