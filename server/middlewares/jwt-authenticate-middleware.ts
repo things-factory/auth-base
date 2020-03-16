@@ -36,21 +36,23 @@ passport.use(
 export async function jwtAuthenticateMiddleware(context, next) {
   return passport.authenticate('jwt', { session: false }, async (err, user, info) => {
     if (err || !user) {
-      const error = new Error('Not authorized')
-
-      if (context.header['sec-fetch-mode'] && context.header['sec-fetch-mode'] != 'navigate') {
-        context.throw(401, {
-          success: false,
-          message: error.message
-        })
-      }
+      context.state.error = err
+      // if (context.header['sec-fetch-mode'] && context.header['sec-fetch-mode'] != 'navigate') {
+      //   context.throw(401, {
+      //     success: false,
+      //     message: error.message
+      //   })
+      // }
 
       await next()
     } else {
-      const userEntity = await User.checkAuth(user)
-
-      context.state.user = userEntity
-      await next()
+      try {
+        const userEntity = await User.checkAuth(user)
+        context.state.user = userEntity
+      } catch (e) {
+      } finally {
+        await next()
+      }
     }
   })(context, next)
 }
