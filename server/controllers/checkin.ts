@@ -6,7 +6,8 @@ export async function checkin({ userId, domainName }) {
   const user = await userRepo.findOne({ where: { id: userId }, relations: ['domain', 'domains'] })
 
   if (!user.domains) return false
-  const domain = user.domains.find(domain => domain.subdomain == domainName)
+  const domains = await user.domains
+  const domain = domains.find(domain => domain.subdomain == domainName)
   if (!domain) return false
 
   user.domain = domain

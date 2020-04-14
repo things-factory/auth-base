@@ -16,17 +16,20 @@ export class SeedUsers1525758367829 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     const repository = getRepository(User)
     const domain = await getRepository(Domain).findOne({ where: { name: 'SYSTEM' } })
-    const domains = [domain]
 
     try {
       for (let i = 0; i < SEED_USERS.length; i++) {
         const user = SEED_USERS[i]
-        await repository.save({
+        const u = await repository.save({
           // domain, /* domain은 사용자 생성시 설정될 필요 없음 */
-          domains,
           ...user,
           password: User.encode(user.password)
         })
+
+        const userId = u.id
+        const domainId = (domain as any).id
+
+        await queryRunner.query(`insert into users_domains values('${userId}', '${domainId}')`)
       }
     } catch (e) {
       console.error(e)

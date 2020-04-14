@@ -47,11 +47,11 @@ export class User {
   @ManyToOne((type) => Domain, {
     nullable: true,
   })
-  domain: Domain
+  domain: Promise<Domain>
 
   @ManyToMany((type) => Domain)
   @JoinTable({ name: 'users_domains' })
-  domains: Domain[]
+  domains: Promise<Domain[]>
 
   @Column()
   email: string
@@ -135,7 +135,8 @@ export class User {
 
   async checkDomain(domainName) {
     if (!domainName) {
-      if (this.domain && this.domain.subdomain) {
+      const domain = await this.domain
+      if (domain?.subdomain) {
         throw new DomainError({
           errorCode: DomainError.ERROR_CODES.REDIRECT_TO_DEFAULT_DOMAIN,
           domains: this.domains,
@@ -147,17 +148,18 @@ export class User {
         })
       }
     } else {
-      if (!this.domains?.length)
+      const domains = await this.domains
+      if (!domains.length)
         throw new DomainError({
           errorCode: DomainError.ERROR_CODES.NO_AVAILABLE_DOMAIN,
           domains: [],
         })
 
-      let foundDomain = this.domains.find((d) => d.subdomain == domainName)
+      let foundDomain = domains.find(d => d.subdomain == domainName)
       if (!foundDomain)
         throw new DomainError({
           errorCode: DomainError.ERROR_CODES.UNAVAILABLE_DOMAIN,
-          domains: this.domains,
+          domains
         })
 
       const repository = getRepository(User)
