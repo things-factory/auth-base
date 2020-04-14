@@ -12,7 +12,7 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from 'typeorm'
 import { AuthError } from '../errors/auth-error'
 import { DomainError } from '../errors/user-domain-not-match-error'
@@ -27,7 +27,7 @@ export enum UserStatus {
   ACTIVATED = 'activated',
   DELETED = 'deleted',
   LOCKED = 'locked',
-  BANNED = 'banned'
+  BANNED = 'banned',
 }
 
 @Entity('users')
@@ -40,16 +40,16 @@ export class User {
   name: string
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   description: string
 
-  @ManyToOne(type => Domain, {
-    nullable: true
+  @ManyToOne((type) => Domain, {
+    nullable: true,
   })
   domain: Promise<Domain>
 
-  @ManyToMany(type => Domain)
+  @ManyToMany((type) => Domain)
   @JoinTable({ name: 'users_domains' })
   domains: Promise<Domain[]>
 
@@ -57,47 +57,44 @@ export class User {
   email: string
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   password: string
 
-  @ManyToMany(
-    type => Role,
-    role => role.users
-  )
+  @ManyToMany((type) => Role, (role) => role.users)
   @JoinTable({ name: 'users_roles' })
   roles: Role[]
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   userType: string // default: 'user, enum: 'user', 'admin'
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   locale: string
 
   @Column({
     type: DATABASE_TYPE == 'postgres' || DATABASE_TYPE == 'mysql' || DATABASE_TYPE == 'mariadb' ? 'enum' : 'smallint',
     enum: UserStatus,
-    default: UserStatus.INACTIVE
+    default: UserStatus.INACTIVE,
   })
   status: UserStatus
 
   @Column({
     type: 'smallint',
-    default: 0
+    default: 0,
   })
   failCount: number
 
-  @ManyToOne(type => User, {
-    nullable: true
+  @ManyToOne((type) => User, {
+    nullable: true,
   })
   creator: User
 
-  @ManyToOne(type => User, {
-    nullable: true
+  @ManyToOne((type) => User, {
+    nullable: true,
   })
   updater: User
 
@@ -114,30 +111,24 @@ export class User {
       email: this.email,
       userType: this.userType,
       domain: this.domain,
-      locale: this.locale
+      locale: this.locale,
     }
 
     return await jwt.sign(user, SECRET, {
       expiresIn: '7d',
       issuer: 'hatiolab.com',
-      subject: 'user'
+      subject: 'user',
     })
   }
 
   /* encode password */
   static encode(password: string) {
-    return crypto
-      .createHmac('sha1', SECRET)
-      .update(password)
-      .digest('base64')
+    return crypto.createHmac('sha1', SECRET).update(password).digest('base64')
   }
 
   /* verify password */
   verify(password: string) {
-    const encrypted = crypto
-      .createHmac('sha1', SECRET)
-      .update(password)
-      .digest('base64')
+    const encrypted = crypto.createHmac('sha1', SECRET).update(password).digest('base64')
 
     return this.password === encrypted
   }
@@ -148,12 +139,12 @@ export class User {
       if (domain?.subdomain) {
         throw new DomainError({
           errorCode: DomainError.ERROR_CODES.REDIRECT_TO_DEFAULT_DOMAIN,
-          domains: this.domains
+          domains: this.domains,
         })
       } else {
         throw new DomainError({
           errorCode: DomainError.ERROR_CODES.NO_SELECTED_DOMAIN,
-          domains: this.domains
+          domains: this.domains,
         })
       }
     } else {
@@ -161,7 +152,7 @@ export class User {
       if (!domains.length)
         throw new DomainError({
           errorCode: DomainError.ERROR_CODES.NO_AVAILABLE_DOMAIN,
-          domains: []
+          domains: [],
         })
 
       let foundDomain = domains.find(d => d.subdomain == domainName)
@@ -178,7 +169,7 @@ export class User {
 
     return {
       token: await this.sign(),
-      domains: this.domains
+      domains: this.domains,
     }
   }
 
@@ -192,26 +183,26 @@ export class User {
   static async checkAuth(decoded) {
     const repository = getRepository(User)
     var user = await repository.findOne(decoded.id, {
-      relations: ['domain', 'domains']
+      relations: ['domain', 'domains'],
     })
 
     if (!user)
       throw new AuthError({
-        errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND
+        errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND,
       })
     else {
       switch (user.status) {
         case UserStatus.INACTIVE:
           throw new AuthError({
-            errorCode: AuthError.ERROR_CODES.USER_NOT_ACTIVATED
+            errorCode: AuthError.ERROR_CODES.USER_NOT_ACTIVATED,
           })
         case UserStatus.LOCKED:
           throw new AuthError({
-            errorCode: AuthError.ERROR_CODES.USER_LOCKED
+            errorCode: AuthError.ERROR_CODES.USER_LOCKED,
           })
         case UserStatus.DELETED:
           throw new AuthError({
-            errorCode: AuthError.ERROR_CODES.USER_DELETED
+            errorCode: AuthError.ERROR_CODES.USER_DELETED,
           })
       }
 

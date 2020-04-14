@@ -32,7 +32,6 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "@things-factory/board-app": "^2.0.0",
-    "@things-factory/board-test": "^2.0.0"
+    "@things-factory/operato-ecs": "^2.0.0"
   }
 }
