@@ -16,7 +16,7 @@ export const Mutation = `
   updateMultipleUser (
     patches: [UserPatch]!
   ): [User]
-  
+
   deleteUser (
     email: String!
   ): Boolean @priviledge(category: "user", priviledge: "mutation")

@@ -9,6 +9,7 @@ export const UserPatch = gql`
     description: String
     email: String
     password: String
+    status: String
     roles: [ObjectRef]
     userType: String
     cuFlag: String

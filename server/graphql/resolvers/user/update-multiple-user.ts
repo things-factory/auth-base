@@ -48,18 +48,30 @@ export const updateMultipleUser = {
             updater: context.state.user
           })
 
-          if (newRecord.domain) {
-            // repository api는 작동하지 않음.
-            await txManager
-              .createQueryBuilder()
-              .update('users_domains')
-              .set({
-                domainsId: newRecord.domain.id
-              })
-              .where({
-                usersId: user.id
-              })
-              .execute()
+          if (newRecord.status) {
+            try {
+              await txManager
+                .createQueryBuilder()
+                .insert()
+                .into('users_domains')
+                .values({
+                  usersId: user.id,
+                  domainsId: (await user.domain).id
+                })
+                .execute()
+            } catch (e) {
+              // repository api는 작동하지 않음.
+              await txManager
+                .createQueryBuilder()
+                .update('users_domains')
+                .set({
+                  domainsId: newRecord.domain.id
+                })
+                .where({
+                  usersId: user.id
+                })
+                .execute()
+            }
           }
 
           results.push({ ...result, cuFlag: 'M' })
