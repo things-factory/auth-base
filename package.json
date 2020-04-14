@@ -28,7 +28,6 @@
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
-    "@things-factory/board-app": "^2.0.0",
-    "@things-factory/board-test": "^2.0.0"
+    "@things-factory/operato-ecs": "^2.0.0"
   }
 }
