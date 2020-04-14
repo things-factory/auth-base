@@ -3,12 +3,12 @@ import { User, UserStatus } from '../entities'
 import { AuthError } from '../errors/auth-error'
 import { USER_NOT_FOUND } from '../constants/error-code'
 export async function deleteAccount(attrs) {
-  await getConnection().transaction(async (txManager) => {
+  await getConnection().transaction(async txManager => {
     const repository = txManager.getRepository(User)
     const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain'] })
     if (!user) {
       throw new AuthError({
-        errorCode: USER_NOT_FOUND,
+        errorCode: USER_NOT_FOUND
       })
     }
 
@@ -22,7 +22,7 @@ export async function deleteAccount(attrs) {
       .delete()
       .from('users_domains')
       .where({
-        usersId: user.id,
+        usersId: user.id
       })
       .execute()
   })
@@ -32,17 +32,17 @@ export async function deleteAccount(attrs) {
 
 export async function deleteAccounts(attrs) {
   const { emails } = attrs
-  await getConnection().transaction(async (txManager) => {
+  await getConnection().transaction(async txManager => {
     const repo = txManager.getRepository(User)
 
     const users = await repo.find({
       where: {
-        email: In(emails),
-      },
+        email: In(emails)
+      }
     })
 
     const userIds = []
-    users.forEach((user) => {
+    users.forEach(user => {
       user.status = UserStatus.DELETED
       userIds.push(user.id)
     })
@@ -54,7 +54,7 @@ export async function deleteAccounts(attrs) {
       .delete()
       .from('users_domains')
       .where({
-        usersId: In(userIds),
+        usersId: In(userIds)
       })
       .execute()
   })

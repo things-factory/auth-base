@@ -7,7 +7,7 @@ export const updateMultipleUser = {
     const _createRecords = patches.filter((patch: any) => patch.cuFlag.toUpperCase() === '+')
     const _updateRecords = patches.filter((patch: any) => patch.cuFlag.toUpperCase() === 'M')
 
-    await getConnection().transaction(async (txManager) => {
+    await getConnection().transaction(async txManager => {
       const userRepo = txManager.getRepository(User)
       if (_createRecords.length > 0) {
         for (let i = 0; i < _createRecords.length; i++) {
@@ -18,7 +18,7 @@ export const updateMultipleUser = {
             password: User.encode(newRecord.password),
             domain: context.state.domain,
             creator: context.state.user,
-            updater: context.state.user,
+            updater: context.state.user
           })
 
           // repository api는 작동하지 않음.
@@ -28,7 +28,7 @@ export const updateMultipleUser = {
             .into('users_domains')
             .values({
               usersId: result.id,
-              domainsId: newRecord.domain.id,
+              domainsId: newRecord.domain.id
             })
             .execute()
 
@@ -45,7 +45,7 @@ export const updateMultipleUser = {
             ...user,
             ...newRecord,
             password: newRecord.password ? User.encode(newRecord.password) : user.password,
-            updater: context.state.user,
+            updater: context.state.user
           })
 
           if (newRecord.domain) {
@@ -54,10 +54,10 @@ export const updateMultipleUser = {
               .createQueryBuilder()
               .update('users_domains')
               .set({
-                domainsId: newRecord.domain.id,
+                domainsId: newRecord.domain.id
               })
               .where({
-                usersId: user.id,
+                usersId: user.id
               })
               .execute()
           }
@@ -68,5 +68,5 @@ export const updateMultipleUser = {
     })
 
     return results
-  },
+  }
 }
