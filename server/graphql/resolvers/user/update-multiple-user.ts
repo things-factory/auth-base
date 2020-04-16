@@ -16,10 +16,23 @@ export const updateMultipleUser = {
           const result = await userRepo.save({
             ...newRecord,
             password: User.encode(newRecord.password),
-            domain: context.state.domain,
+            // domain: Promise.resolve(newRecord.domain || context.state.domain),
+            domain: newRecord.domain || context.state.domain,
             creator: context.state.user,
             updater: context.state.user
           })
+
+          // TODO: repository.save에서 domain ID가 같이 저장되게 바꾸어야 함.
+          await txManager
+            .createQueryBuilder()
+            .update('users')
+            .set({
+              domain: (newRecord.domain || context.state.domain).id
+            })
+            .where({
+              id: result.id
+            })
+            .execute()
 
           // repository api는 작동하지 않음.
           await txManager
