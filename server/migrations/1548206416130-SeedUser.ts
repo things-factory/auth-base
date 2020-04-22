@@ -1,12 +1,17 @@
 import { Domain } from '@things-factory/shell'
+import { config } from '@things-factory/env'
 import { getRepository, MigrationInterface, QueryRunner } from 'typeorm'
 import { User, UserStatus } from '../entities'
 
+const ADMIN_ACCOUNT = config.get('adminAccount', {
+  name: 'Admin',
+  email: 'admin@hatiolab.com',
+  password: 'admin'
+})
+
 const SEED_USERS = [
   {
-    name: 'Admin',
-    email: 'admin@hatiolab.com',
-    password: 'admin',
+    ...ADMIN_ACCOUNT,
     userType: 'admin',
     status: UserStatus.ACTIVATED
   }
