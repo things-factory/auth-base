@@ -26,8 +26,9 @@ secureRouter
     const { user } = context.state
     if (!user) return context.redirect('/signin')
 
-    if (!user.domain) return context.redirect('/domain-select')
-    return context.redirect(`/domain/${user.domain.subdomain}`)
+    const domain = await user.domain
+    if (!domain) return context.redirect('/domain-select')
+    return context.redirect(`/domain/${domain.subdomain}`)
   })
   .get('/signin', async (context, next) => {
     try {
