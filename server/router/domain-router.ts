@@ -2,10 +2,9 @@ import Router from 'koa-router'
 import { getRepository } from 'typeorm'
 import { User } from '../entities'
 import { AuthError } from '../errors/auth-error'
-import { jwtAuthenticateMiddleware } from '../middlewares'
 import { getToken } from '../utils/get-token'
+import { jwtAuthenticateMiddleware } from '../middlewares'
 export const domainRouter = new Router()
-domainRouter.use(jwtAuthenticateMiddleware)
 
 const bodyParserOption = {
   formLimit: '10mb',
@@ -25,19 +24,14 @@ async function domainCheck(context, next) {
     const { params } = context
     const { domainName } = params
 
-    const user = await getRepository(User).findOne({
-      where: {
-        id: decodedToken.id
-      },
-      relations: ['domain', 'domains']
-    })
+    const user = { ...decodedToken }
 
     if (!user)
       throw new AuthError({
         errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND
       })
 
-    const userDomain = await user?.domain
+    const userDomain = await user.domain
     if (userDomain?.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
 
     return next()
@@ -49,16 +43,17 @@ async function domainCheck(context, next) {
 
 domainRouter
   .get('*', async (context, next) => {
-    getToken(context)
     return await next()
   })
-  .get('/', async (context, next) => {
+  .get('/', jwtAuthenticateMiddleware, async (context, next) => {
     if (!context.state.user) return context.redirect('/signin')
     return context.redirect('/default-domain')
   })
-  .get('/domain/:domainName', async (context, next) => {
+  .get('/domain/:domainName', jwtAuthenticateMiddleware, async (context, next) => {
+    if (!context.state.user) return context.redirect('/signin')
     return await domainCheck(context, next)
   })
-  .get('/domain/:domainName/*', async (context, next) => {
+  .get('/domain/:domainName/*', jwtAuthenticateMiddleware, async (context, next) => {
+    if (!context.state.user) return context.redirect('/signin')
     return await domainCheck(context, next)
   })

@@ -34,9 +34,23 @@ passport.use(
 )
 
 export async function jwtAuthenticateMiddleware(context, next) {
-  return passport.authenticate('jwt', { session: false }, async (err, user, info) => {
+  return await passport.authenticate('jwt', { session: false }, async (err, user, info) => {
     if (err || !user) {
-      context.state.error = err
+      context.state.error = err || info
+
+      if (
+        context.method == 'POST'
+        // ||
+        // (context._matchedRoute == context.path &&
+        //   (context.get('sec-fetch-mode') == 'navigate' || context.get('sec-fetch-dest') == 'document'))
+      ) {
+        context.status = 401
+        context.body = {
+          success: false,
+          message: info.message
+        }
+        return
+      }
       // if (context.header['sec-fetch-mode'] && context.header['sec-fetch-mode'] != 'navigate') {
       //   context.throw(401, {
       //     success: false,
@@ -44,7 +58,7 @@ export async function jwtAuthenticateMiddleware(context, next) {
       //   })
       // }
 
-      await next()
+      await next(context.state.error)
     } else {
       try {
         const userEntity = await User.checkAuth(user)

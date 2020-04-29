@@ -108,10 +108,9 @@ export class User {
   async sign() {
     var user = {
       id: this.id,
-      email: this.email,
       userType: this.userType,
-      domain: this.domain,
-      locale: this.locale
+      status: this.status,
+      domain: await this.domain
     }
 
     return await jwt.sign(user, SECRET, {
@@ -181,10 +180,13 @@ export class User {
   }
 
   static async checkAuth(decoded) {
-    const repository = getRepository(User)
-    var user = await repository.findOne(decoded.id, {
-      relations: ['domain', 'domains']
-    })
+    var user = {
+      ...decoded
+    }
+    // const repository = getRepository(User)
+    // var user = await repository.findOne(decoded.id, {
+    //   cache: true
+    // })
 
     if (!user)
       throw new AuthError({

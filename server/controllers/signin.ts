@@ -1,10 +1,10 @@
 import { getRepository } from 'typeorm'
+import { sendUnlockAccountEmail } from '../controllers/unlock-account'
 import { User, UserStatus } from '../entities'
 import { AuthError } from '../errors/auth-error'
-import { sendUnlockAccountEmail } from '../controllers/unlock-account'
 export async function signin(attrs, context?) {
   const repository = getRepository(User)
-  const user = await repository.findOne({ where: { email: attrs.email }, relations: ['domain', 'domains'] })
+  const user = await repository.findOne({ where: { email: attrs.email } })
   if (!user)
     throw new AuthError({
       errorCode: AuthError.ERROR_CODES.USER_NOT_FOUND

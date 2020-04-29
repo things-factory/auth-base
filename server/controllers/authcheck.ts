@@ -5,7 +5,7 @@ import { AuthError } from '../errors/auth-error'
 import { DomainError } from '../errors/user-domain-not-match-error'
 export async function authcheck({ id, domain }) {
   const repository = getRepository(User)
-  const user = await repository.findOne({ where: { id }, relations: ['domain', 'domains'] })
+  const user = await repository.findOne({ where: { id } })
   // id와 일치하는 유저가 있는지 체크
   if (!user)
     throw new AuthError({

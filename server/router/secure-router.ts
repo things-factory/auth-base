@@ -172,11 +172,8 @@ secureRouter
   })
   .get('/profile', async (context, next) => {
     try {
-      const { request } = context
-      const { header } = request
-      const { referer } = header
-      const { pathname } = new URL(referer)
-      const { domain, path, contextPath } = getPathInfo(pathname)
+      if (context.state.error) throw context.state.error
+
       const userRepo = getRepository(User)
       const user = await userRepo.findOne({
         where: {
