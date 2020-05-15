@@ -162,7 +162,7 @@ export class User {
         })
 
       const repository = getRepository(User)
-      this.domain = foundDomain
+      this.domain = Promise.resolve(foundDomain)
       await repository.save(this)
     }
 

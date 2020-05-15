@@ -15,7 +15,7 @@ const bodyParserOption = {
 signinRouter.post('/signin', async (context, next) => {
   const { secure, request } = context
   const { token, user, error } = context.state
-  const { body: reqBody } = request
+  const { body: reqBody, header } = request
 
   if (!user) {
     context.status = 401
@@ -32,12 +32,16 @@ signinRouter.post('/signin', async (context, next) => {
     })
   }
 
-  const redirectTo = reqBody.redirect_to || (await getDefaultDomain(user))
-  context.cookies.set('access_token', token, {
-    secure,
-    httpOnly: true,
-    maxAge: MAX_AGE
-  })
+  if ('x-only-token' in header) {
+    context.body = token
+  } else {
+    const redirectTo = reqBody.redirect_to || (await getDefaultDomain(user))
+    context.cookies.set('access_token', token, {
+      secure,
+      httpOnly: true,
+      maxAge: MAX_AGE
+    })
 
-  context.redirect(redirectTo)
+    context.redirect(redirectTo)
+  }
 })
