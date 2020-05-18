@@ -180,13 +180,10 @@ export class User {
   }
 
   static async checkAuth(decoded) {
-    var user = {
-      ...decoded
-    }
-    // const repository = getRepository(User)
-    // var user = await repository.findOne(decoded.id, {
-    //   cache: true
-    // })
+    const repository = getRepository(User)
+    var user = await repository.findOne(decoded.id, {
+      cache: true
+    })
 
     if (!user)
       throw new AuthError({
