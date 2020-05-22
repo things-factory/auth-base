@@ -20,16 +20,10 @@ signinRouter.post('/signin', async (context, next) => {
   if (!user) {
     context.status = 401
     context.body = {
+      success: false,
       message: error.message
     }
-    return await context.render('auth-page', {
-      pageElement: 'auth-signin',
-      elementScript: '/signin.js',
-      data: {
-        message: error.message,
-        detail: error.detail
-      }
-    })
+    return
   }
 
   if ('x-only-token' in header) {
@@ -41,6 +35,11 @@ signinRouter.post('/signin', async (context, next) => {
       httpOnly: true,
       maxAge: MAX_AGE
     })
+
+    context.body = {
+      success: true,
+      token
+    }
 
     context.redirect(redirectTo)
   }

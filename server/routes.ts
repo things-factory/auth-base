@@ -14,11 +14,8 @@ const SECRET = config.get('SECRET', '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
   var paths = [
     // static pages
-    'signin',
     'signup',
     'signout',
-    'default-domain',
-    'domain-select',
     'forgot-password',
     'reset-password',
     'unlock-account',
@@ -33,8 +30,6 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     // 'domain'
   ]
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
-
-  app.use(domainRouter.routes())
 })
 
 process.on('bootstrap-module-route' as any, (app, routes) => {
@@ -44,6 +39,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     textLimit: '10mb'
   }
 
+  app.use(domainRouter.routes())
   app.use(secureRouter.routes())
   app.use(signinRouter.routes())
 

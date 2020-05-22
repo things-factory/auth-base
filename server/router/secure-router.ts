@@ -8,7 +8,6 @@ import { deleteAccount } from '../controllers/delete-account'
 import { updateProfile } from '../controllers/profile'
 import { User } from '../entities'
 import { jwtAuthenticateMiddleware } from '../middlewares'
-import { getDefaultDomain } from '../utils/default-domain'
 
 export const secureRouter = new Router()
 secureRouter.use(jwtAuthenticateMiddleware)
@@ -28,32 +27,6 @@ secureRouter
     if (!domain) return context.redirect('/domain-select')
     return context.redirect(`/domain/${domain.subdomain}`)
   })
-  .get('/signin', async (context, next) => {
-    try {
-      const { query } = context
-      const { user } = context.state
-      const { redirect_to } = query
-      // check signed in
-      if (!user)
-        return await context.render('auth-page', {
-          pageElement: 'auth-signin',
-          elementScript: '/signin.js',
-          data: {
-            redirectTo: redirect_to
-          }
-        })
-
-      const redirectTo = await getDefaultDomain(user)
-
-      context.redirect(redirectTo)
-    } catch (e) {
-      await context.render('auth-page', {
-        pageElement: 'auth-signin',
-        elementScript: '/signin.js',
-        data: {}
-      })
-    }
-  })
   .get('/domain-select', async (context, next) => {
     const { secure } = context
     const { user } = context.state
@@ -61,13 +34,10 @@ secureRouter
       if (!user) return context.redirect('/signin')
       const domains = await user.domains
 
-      await context.render('auth-page', {
-        pageElement: 'auth-domain-select',
-        elementScript: '/domain-select.js',
-        data: {
-          domains
-        }
-      })
+      context.body = {
+        success: true,
+        domains
+      }
     } catch (e) {
       context.cookies.set('access_token', '', {
         secure,
@@ -184,6 +154,7 @@ secureRouter
         domains: await user.domains // jwt-koa or authMiddleware will set context.state.token, user
       }
     } catch (e) {
+      context.status = 401
       context.body = {
         message: e.message,
         domains: []

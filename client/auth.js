@@ -27,6 +27,7 @@ class ClientAuth {
     signupPath = 'signup',
     signinPath = 'signin',
     profilePath = 'profile',
+    checkinPath = 'checkin',
     updateProfilePath = 'update-profile',
     changepassPath = 'change_pass',
     deleteAccountPath = 'delete-account',
@@ -41,6 +42,8 @@ class ClientAuth {
       signin: [],
       signout: [],
       profile: [],
+      checkin: [],
+      [authRequiredEvent]: [],
       changePassword: [],
       error: []
     }
@@ -56,6 +59,7 @@ class ClientAuth {
     this.signupPath = signupPath
     this.signinPath = signinPath
     this.profilePath = profilePath
+    this.checkinPath = checkinPath
     this.changepassPath = changepassPath
     this.updateProfilePath = updateProfilePath
     this.deleteAccountPath = deleteAccountPath
@@ -126,11 +130,12 @@ class ClientAuth {
       this.signin = provider.signin.bind(this)
       this.signout = provider.signout.bind(this)
       this.profile = provider.profile.bind(this)
+      this.checkin = provider.checkin.bind(this)
       this.changePassword = provider.changePassword.bind(this)
       this.updateProfile = provider.updateProfile.bind(this)
       this.deleteAccount = provider.deleteAccount.bind(this)
     } else {
-      this.signup = this.signin = this.signout = this.profile = NOOP
+      this.signup = this.signin = this.signout = this.profile = this.checkin = this.changePassword = this.updateProfile = this.deleteAccount = NOOP
     }
   }
 
@@ -167,7 +172,7 @@ class ClientAuth {
     this.accessToken = accessToken
     this.domains = domains
 
-    this._event_listeners.signin.forEach(handler => handler({ accessToken, domains }))
+    this._event_listeners.signin.forEach(handler => handler({ accessToken, domains, redirectTo }))
   }
 
   onProfileFetched({ credential, accessToken, domains }) {
@@ -210,10 +215,14 @@ class ClientAuth {
 
   onAuthRequired(e) {
     console.warn('authentication required')
-    let url = new URL(window.location)
-    url.pathname = this.signinPage
-    url.searchParams.append('redirect_to', window.location.href)
-    window.location = url
+    this._event_listeners[this.authRequiredEvent].forEach(handler => handler())
+    // let url = new URL(window.location)
+
+    // if (new RegExp(`/?${this.signinPage}`).test(url.pathname)) return
+
+    // url.pathname = this.signinPage
+    // url.searchParams.append('redirect_to', window.location.href)
+    // window.location = url
   }
 
   onActivateRequired(e) {

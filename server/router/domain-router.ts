@@ -1,9 +1,8 @@
 import Router from 'koa-router'
-import { getRepository } from 'typeorm'
 import { User } from '../entities'
 import { AuthError } from '../errors/auth-error'
-import { getToken } from '../utils/get-token'
 import { jwtAuthenticateMiddleware } from '../middlewares'
+import { getToken } from '../utils/get-token'
 export const domainRouter = new Router()
 
 const bodyParserOption = {
@@ -34,7 +33,10 @@ async function domainCheck(context, next) {
     const userDomain = await user.domain
     if (userDomain?.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
 
-    return next()
+    context.body = {
+      success: true,
+      token: user
+    }
   } catch (e) {
     const { originalUrl } = context
     return context.redirect(`/signin?redirect_to=${originalUrl}`)
