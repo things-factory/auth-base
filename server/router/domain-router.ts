@@ -33,13 +33,16 @@ async function domainCheck(context, next) {
     const userDomain = await user.domain
     if (userDomain?.subdomain != domainName) return context.redirect(`/checkin/${domainName}`)
 
-    context.body = {
+    context = {
       success: true,
       token: user
     }
   } catch (e) {
     const { originalUrl } = context
-    return context.redirect(`/signin?redirect_to=${originalUrl}`)
+    context.status = 401
+    return
+
+    // return context.redirect(`/signin?redirect_to=${originalUrl}`)
   }
 }
 
@@ -48,14 +51,23 @@ domainRouter
     return await next()
   })
   .get('/', jwtAuthenticateMiddleware, async (context, next) => {
-    if (!context.state.user) return context.redirect('/signin')
+    if (!context.state.user) {
+      context.status = 401
+      return
+    }
     return context.redirect('/default-domain')
   })
   .get('/domain/:domainName', jwtAuthenticateMiddleware, async (context, next) => {
-    if (!context.state.user) return context.redirect('/signin')
+    if (!context.state.user) {
+      context.status = 401
+      return
+    }
     return await domainCheck(context, next)
   })
   .get('/domain/:domainName/*', jwtAuthenticateMiddleware, async (context, next) => {
-    if (!context.state.user) return context.redirect('/signin')
+    if (!context.state.user) {
+      context.status = 401
+      return
+    }
     return await domainCheck(context, next)
   })

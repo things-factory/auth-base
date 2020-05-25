@@ -39,7 +39,6 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     textLimit: '10mb'
   }
 
-  app.use(domainRouter.routes())
   app.use(secureRouter.routes())
   app.use(signinRouter.routes())
 

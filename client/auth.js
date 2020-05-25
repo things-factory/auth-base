@@ -73,11 +73,8 @@ class ClientAuth {
 
   on(event, handler) {
     var listeners = this._event_listeners[event]
-    if (listeners) {
-      listeners.push(handler)
-    } else {
-      console.log('unknown event', event)
-    }
+    if (listeners) listeners.push(handler)
+    else console.log('unknown event', event)
   }
 
   off(event, handler) {
@@ -194,8 +191,6 @@ class ClientAuth {
     this.credential = null
     this.domains = []
     this._event_listeners.signout.forEach(handler => handler())
-
-    window.location.replace(`/${this.signoutPage ? this.signoutPage : this.signinPage}`)
   }
 
   onAuthError(error) {
@@ -229,6 +224,8 @@ class ClientAuth {
     console.warn('activate required')
     window.location.replace(this.fullpage(`${this.activatePage}?email=${e.email}`))
   }
+
+  openPage(page) {}
 
   route(path, redirected) {
     /* history에 남긴다. redirected된 상태임을 남긴다. */

@@ -150,7 +150,10 @@ secureRouter
       })
 
       context.body = {
-        user,
+        user: {
+          ...user,
+          domain: await user.domain
+        },
         domains: await user.domains // jwt-koa or authMiddleware will set context.state.token, user
       }
     } catch (e) {
