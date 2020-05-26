@@ -29,7 +29,6 @@ signinRouter.post('/signin', async (context, next) => {
   if ('x-only-token' in header) {
     context.body = token
   } else {
-    const redirectTo = reqBody.redirect_to || (await getDefaultDomain(user))
     context.cookies.set('access_token', token, {
       secure,
       httpOnly: true,
@@ -40,7 +39,5 @@ signinRouter.post('/signin', async (context, next) => {
       success: true,
       token
     }
-
-    context.redirect(redirectTo)
   }
 })

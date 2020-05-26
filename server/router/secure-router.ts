@@ -3,7 +3,7 @@ import Router from 'koa-router'
 import { getRepository } from 'typeorm'
 import { MAX_AGE } from '../constants/max-age'
 import { changePwd } from '../controllers/change-pwd'
-import { checkin } from '../controllers/checkin'
+import { checkin, checkinTo } from '../controllers/checkin'
 import { deleteAccount } from '../controllers/delete-account'
 import { updateProfile } from '../controllers/profile'
 import { User } from '../entities'
@@ -19,56 +19,31 @@ const bodyParserOption = {
 }
 
 secureRouter
-  .get('/default-domain', async (context, next) => {
-    const { user } = context.state
-    if (!user) return context.redirect('/signin')
-
-    const domain = await user.domain
-    if (!domain) return context.redirect('/domain-select')
-    return context.redirect(`/domain/${domain.subdomain}`)
-  })
-  .get('/domain-select', async (context, next) => {
-    const { secure } = context
-    const { user } = context.state
-    try {
-      if (!user) return context.redirect('/signin')
-      const domains = await user.domains
-
-      context.body = {
-        success: true,
-        domains
-      }
-    } catch (e) {
-      context.cookies.set('access_token', '', {
-        secure,
-        httpOnly: true
-      })
-      context.redirect('/signin')
-    }
-  })
   .get('/checkin/:domainName', async (context, next) => {
     try {
-      const { params, secure } = context
+      const { params } = context
       const { domainName } = params
       const { user } = context.state
 
-      const newToken = await checkin({
-        userId: user.id,
+      const checkedIn = await checkinTo({
+        user,
         domainName
       })
 
-      if (newToken) {
-        context.cookies.set('access_token', newToken, {
-          secure,
-          httpOnly: true,
-          maxAge: MAX_AGE
-        })
-        context.redirect(`/domain/${domainName}`)
+      if (checkedIn) {
+        context.body = {
+          success: true
+        }
       } else {
-        context.redirect('/domain-select')
+        context.body = {
+          success: false
+        }
       }
     } catch (e) {
-      context.redirect('/domain-select')
+      context.status = 401
+      context.body = {
+        success: false
+      }
     }
   })
   .post('/change_pass', koaBodyParser(bodyParserOption), async (context, next) => {
@@ -150,10 +125,8 @@ secureRouter
       })
 
       context.body = {
-        user: {
-          ...user,
-          domain: await user.domain
-        },
+        ...user,
+        domain: await user.domain,
         domains: await user.domains // jwt-koa or authMiddleware will set context.state.token, user
       }
     } catch (e) {

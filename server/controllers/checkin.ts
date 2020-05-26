@@ -1,17 +1,22 @@
 import { getRepository } from 'typeorm'
 import { User } from '../entities'
 
-export async function checkin({ userId, domainName }) {
-  const userRepo = getRepository(User)
-  const user = await userRepo.findOne({ where: { id: userId }, relations: ['domain', 'domains'] })
+export async function checkin({ user }: { user: User }) {
+  const domain = await user.domain
+  return domain?.subdomain
+}
 
-  if (!user.domains) return false
-  const domains = await user.domains
+export async function checkinTo({ user, domainName }: { user: User; domainName: String }) {
+  const userDomains = await user.domains
+  const userRepo = getRepository(User)
+
+  if (!userDomains) return false
+  const domains = await userDomains
   const domain = domains.find(domain => domain.subdomain == domainName)
   if (!domain) return false
 
   user.domain = Promise.resolve(domain)
   await userRepo.save(user)
 
-  return await user.sign()
+  return true
 }
