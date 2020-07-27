@@ -21,3 +21,4 @@ nodemon.json
 tsconfig.json
 ormconfig.js
 /config.*.js
+server/

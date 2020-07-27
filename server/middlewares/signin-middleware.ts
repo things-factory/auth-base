@@ -15,7 +15,6 @@ passport.use(
           email,
           password
         })
-
         return done(
           null,
           {

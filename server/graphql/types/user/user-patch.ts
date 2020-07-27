@@ -1,17 +1,4 @@
-import gql from 'graphql-tag'
+import { Partial } from '@things-factory/graphql-utils'
+import { User } from '../../../entities'
 
-export const UserPatch = gql`
-  input UserPatch {
-    id: String
-    name: String
-    domain: ObjectRef
-    domains: [ObjectRef]
-    description: String
-    email: String
-    password: String
-    status: String
-    roles: [ObjectRef]
-    userType: String
-    cuFlag: String
-  }
-`
+export class UserPatch extends Partial(User) {}

@@ -1,5 +1,5 @@
 import koaBodyParser from 'koa-bodyparser'
-import Router from 'koa-router'
+import Router from '@koa/router'
 import { getRepository } from 'typeorm'
 import { MAX_AGE } from '../constants/max-age'
 import { changePwd } from '../controllers/change-pwd'

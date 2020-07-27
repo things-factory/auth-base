@@ -1,4 +1,4 @@
-import { Domain } from '@things-factory/shell'
+import { Domain } from '@things-factory/domain-base'
 import { getRepository, MigrationInterface, QueryRunner } from 'typeorm'
 import { Priviledge } from '../entities'
 

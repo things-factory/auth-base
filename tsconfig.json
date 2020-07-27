@@ -2,18 +2,26 @@
   "compileOnSave": false,
   "compilerOptions": {
     "noImplicitAny": false,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "types": ["node"],
     "module": "commonjs",
-    "target": "es2017",
+    "target": "es2018",
     "outDir": "./dist-server",
     "sourceMap": true,
     "baseUrl": "./",
-    "lib": ["esnext.asynciterable", "es7", "es2017"]
+    "lib": ["esnext.asynciterable", "es7", "es2018"],
+    "paths": {
+      "*": ["*"],
+      "graphql": ["node_modules/graphql"],
+      "typedi": ["node_modules/typedi"],
+      "typeorm": ["node_modules/typeorm"],
+      "class-validator": ["node_modules/class-validator"]
+    }
   },
   "include": ["./server/**/*"],
-  "exclude": ["**/*.spec.ts"]
+  "exclude": ["**/*.spec.ts", "**/node_modules/**"]
 }

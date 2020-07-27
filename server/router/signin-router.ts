@@ -1,4 +1,4 @@
-import Router from 'koa-router'
+import Router from '@koa/router'
 import { MAX_AGE } from '../constants/max-age'
 import { signinMiddleware } from '../middlewares'
 import { getDefaultDomain } from '../utils/default-domain'

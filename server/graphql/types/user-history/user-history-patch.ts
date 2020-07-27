@@ -1,9 +1,4 @@
-import gql from 'graphql-tag'
+import { Partial } from '@things-factory/graphql-utils'
+import { UserHistory } from '../../../entities'
 
-export const UserHistoryPatch = gql`
-  input UserHistoryPatch {
-    id: String
-    userAccountId: String
-    status: String
-  }
-`
+export class UserHistoryPatch extends Partial(UserHistory) {}

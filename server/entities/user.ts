@@ -1,7 +1,8 @@
+import { Domain } from '@things-factory/domain-base'
 import { config } from '@things-factory/env'
-import { Domain } from '@things-factory/shell'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
+import { Field, ID, Int, ObjectType, registerEnumType } from 'type-graphql'
 import {
   Column,
   CreateDateColumn,
@@ -30,51 +31,58 @@ export enum UserStatus {
   BANNED = 'banned'
 }
 
+registerEnumType(UserStatus, {
+  name: 'UserStatus',
+  description: 'User status'
+})
+
+@ObjectType()
 @Entity('users')
 @Index('ix_user_0', (user: User) => [user.email], { unique: true })
 export class User {
+  @Field(type => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string
 
+  @Field()
   @Column()
   name: string
 
-  @Column({
-    nullable: true
-  })
-  description: string
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  description?: string
 
-  @ManyToOne(type => Domain, {
-    nullable: true
-  })
-  domain: Promise<Domain>
+  @Field(type => Domain, { nullable: true })
+  @ManyToOne(type => Domain, { nullable: true })
+  domain?: Promise<Domain>
 
+  @Field(type => [Domain])
   @ManyToMany(type => Domain)
   @JoinTable({ name: 'users_domains' })
   domains: Promise<Domain[]>
 
+  @Field()
   @Column()
   email: string
 
-  @Column({
-    nullable: true
-  })
-  password: string
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  password?: string
 
+  @Field(type => [Role])
   @ManyToMany(type => Role, role => role.users)
   @JoinTable({ name: 'users_roles' })
   roles: Role[]
 
-  @Column({
-    nullable: true
-  })
-  userType: string // default: 'user, enum: 'user', 'admin'
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  userType?: string // default: 'user, enum: 'user', 'admin'
 
-  @Column({
-    nullable: true
-  })
-  locale: string
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  locale?: string
 
+  @Field(type => UserStatus, { defaultValue: UserStatus.INACTIVE })
   @Column({
     type: DATABASE_TYPE == 'postgres' || DATABASE_TYPE == 'mysql' || DATABASE_TYPE == 'mariadb' ? 'enum' : 'smallint',
     enum: UserStatus,
@@ -82,25 +90,26 @@ export class User {
   })
   status: UserStatus
 
+  @Field(type => Int, { defaultValue: 0 })
   @Column({
     type: 'smallint',
     default: 0
   })
   failCount: number
 
-  @ManyToOne(type => User, {
-    nullable: true
-  })
-  creator: User
+  @Field(type => User, { nullable: true })
+  @ManyToOne(type => User, { nullable: true })
+  creator?: User
 
-  @ManyToOne(type => User, {
-    nullable: true
-  })
-  updater: User
+  @Field(type => User, { nullable: true })
+  @ManyToOne(type => User, { nullable: true })
+  updater?: User
 
+  @Field(type => Date)
   @CreateDateColumn()
   createdAt: Date
 
+  @Field(type => Date)
   @UpdateDateColumn()
   updatedAt: Date
 

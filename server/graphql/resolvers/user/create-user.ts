@@ -1,4 +1,4 @@
-import { Domain } from '@things-factory/shell'
+import { Domain } from '@things-factory/domain-base'
 import { getRepository } from 'typeorm'
 import { Role, User } from '../../../entities'
 

@@ -1,4 +1,4 @@
-import { buildQuery, ListParam } from '@things-factory/shell'
+import { buildQuery, ListParam } from '@things-factory/graphql-utils'
 import { getRepository } from 'typeorm'
 import { User } from '../../../entities'
 

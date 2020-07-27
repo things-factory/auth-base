@@ -13,7 +13,6 @@ export async function signup(attrs, withEmailVerification?: Boolean) {
     ...attrs,
     password: User.encode(attrs.password)
   }
-
   const user = await repository.save({ ...newattrs })
   var succeed = false
   if (withEmailVerification) {

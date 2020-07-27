@@ -1,10 +1,14 @@
-import gql from 'graphql-tag'
+import { Field, InputType } from 'type-graphql'
+import { PermitUrl } from '../../../entities'
 
-export const NewPermitUrl = gql`
-  input NewPermitUrl {
-    name: String!
-    description: String
-    type: String!
-    active: Boolean
-  }
-`
+@InputType()
+export class NewPermitUrl extends PermitUrl {
+  @Field()
+  name: string
+  @Field({ nullable: true })
+  description?: string
+  @Field()
+  type: string
+  @Field({ nullable: true })
+  active?: boolean
+}

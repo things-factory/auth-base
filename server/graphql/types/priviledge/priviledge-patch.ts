@@ -1,11 +1,4 @@
-import gql from 'graphql-tag'
+import { Partial } from '@things-factory/graphql-utils'
+import { Priviledge } from '../../../entities'
 
-export const PriviledgePatch = gql`
-  input PriviledgePatch {
-    id: String
-    name: String
-    category: String
-    description: String
-    roles: [RolePatch]
-  }
-`
+export class PriviledgePatch extends Partial(Priviledge) {}

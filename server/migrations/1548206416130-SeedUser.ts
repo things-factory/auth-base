@@ -1,4 +1,4 @@
-import { Domain } from '@things-factory/shell'
+import { Domain } from '@things-factory/domain-base'
 import { config } from '@things-factory/env'
 import { getRepository, MigrationInterface, QueryRunner } from 'typeorm'
 import { User, UserStatus } from '../entities'

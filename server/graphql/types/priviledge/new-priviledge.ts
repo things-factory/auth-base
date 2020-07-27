@@ -1,10 +1,14 @@
-import gql from 'graphql-tag'
+import { Field, InputType } from 'type-graphql'
+import { Priviledge, Role } from '../../../entities'
 
-export const NewPriviledge = gql`
-  input NewPriviledge {
-    name: String!
-    category: String!
-    description: String
-    roles: [RolePatch]
-  }
-`
+@InputType()
+export class NewPriviledge extends Priviledge {
+  @Field()
+  name: string
+  @Field()
+  category: string
+  @Field({ nullable: true })
+  description?: string
+  @Field(type => [Role])
+  roles: Role[]
+}

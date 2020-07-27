@@ -1,9 +1,9 @@
-import { User, UserStatus } from './user'
-import { UserHistory } from './user-history'
-import { Role } from './role'
+import { Appliance } from './appliance'
 import { PermitUrl } from './permit-url'
 import { Priviledge } from './priviledge'
-import { Appliance } from './appliance'
+import { Role } from './role'
+import { User, UserStatus } from './user'
+import { UserHistory } from './user-history'
 import { VerificationToken, VerificationTokenType } from './verification-token'
 
 export const entities = [User, UserHistory, Role, PermitUrl, Priviledge, Appliance, VerificationToken]

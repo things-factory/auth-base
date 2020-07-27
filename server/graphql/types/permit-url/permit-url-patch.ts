@@ -1,11 +1,4 @@
-import gql from 'graphql-tag'
+import { Partial } from '@things-factory/graphql-utils'
+import { PermitUrl } from '../../../entities'
 
-export const PermitUrlPatch = gql`
-  input PermitUrlPatch {
-    id: String
-    name: String
-    description: String
-    type: String
-    active: Boolean
-  }
-`
+export class PermitUrlPatch extends Partial(PermitUrl) {}

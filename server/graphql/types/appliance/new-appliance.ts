@@ -1,12 +1,18 @@
-import gql from 'graphql-tag'
+import { Field, InputType } from 'type-graphql'
+import { Appliance } from '../../../entities/appliance'
 
-export const NewAppliance = gql`
-  input NewAppliance {
-    applianceId: String!
-    name: String!
-    brand: String!
-    model: String!
-    type: String!
-    description: String
-  }
-`
+@InputType()
+export class NewAppliance extends Appliance {
+  @Field()
+  applianceId: string
+  @Field()
+  name: string
+  @Field()
+  brand: string
+  @Field()
+  model: string
+  @Field()
+  type: string
+  @Field({ nullable: true })
+  description?: string
+}

@@ -1,8 +1,10 @@
-import gql from 'graphql-tag'
+import { Field, InputType } from 'type-graphql'
+import { UserHistory } from '../../../entities'
 
-export const NewUserHistory = gql`
-  input NewUserHistory {
-    userAccountId: String
-    status: String
-  }
-`
+@InputType()
+export class NewUserHistory extends UserHistory {
+  @Field({ nullable: true })
+  userAccountId?: string
+  @Field({ nullable: true })
+  status?: string
+}
