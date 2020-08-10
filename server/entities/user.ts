@@ -18,7 +18,14 @@ import { AuthError } from '../errors/auth-error'
 import { DomainError } from '../errors/user-domain-not-match-error'
 import { Role } from './role'
 
-const SECRET = config.get('SECRET', '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95')
+var SECRET = config.get('SECRET')
+if (!SECRET) {
+  if (process.env.NODE_ENV == 'production') {
+    throw new TypeError('SECRET key not configured.')
+  } else {
+    SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
+  }
+}
 const ORMCONFIG = config.get('ormconfig', {})
 const DATABASE_TYPE = ORMCONFIG.type
 
