@@ -1,8 +1,8 @@
 import { Field, InputType } from 'type-graphql'
-import { Priviledge, Role } from '../../../entities'
+import { Privilege, Role } from '../../../entities'
 
 @InputType()
-export class NewPriviledge extends Priviledge {
+export class NewPrivilege extends Privilege {
   @Field()
   name: string
   @Field()

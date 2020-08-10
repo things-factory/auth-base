@@ -1,9 +1,11 @@
 import { Domain } from '@things-factory/domain-base'
 import { config } from '@things-factory/env'
 import crypto from 'crypto'
+import DataLoader from 'dataloader'
 import jwt from 'jsonwebtoken'
-import { Field, ID, Int, ObjectType, registerEnumType } from 'type-graphql'
+import { Field, ID, InputType, Int, ObjectType, registerEnumType } from 'type-graphql'
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -36,10 +38,17 @@ registerEnumType(UserStatus, {
   description: 'User status'
 })
 
+async function _findByIdsBatch(ids: string[]) {
+  return User.findByIds(ids)
+}
+
+const _userLoader = new DataLoader(_findByIdsBatch)
+
+@InputType('UserInput')
 @ObjectType()
 @Entity('users')
 @Index('ix_user_0', (user: User) => [user.email], { unique: true })
-export class User {
+export class User extends BaseEntity {
   @Field(type => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -52,14 +61,17 @@ export class User {
   @Column({ nullable: true })
   description?: string
 
+  @Column({ nullable: true })
+  domainId?: string
+
   @Field(type => Domain, { nullable: true })
   @ManyToOne(type => Domain, { nullable: true })
-  domain?: Promise<Domain>
+  domain?: Domain
 
   @Field(type => [Domain])
   @ManyToMany(type => Domain)
   @JoinTable({ name: 'users_domains' })
-  domains: Promise<Domain[]>
+  domains: Domain[]
 
   @Field()
   @Column()
@@ -112,6 +124,10 @@ export class User {
   @Field(type => Date)
   @UpdateDateColumn()
   updatedAt: Date
+
+  static async findByIdsBatch(id: string) {
+    return await _userLoader.load(id)
+  }
 
   /* signing for jsonwebtoken */
   async sign() {
@@ -171,7 +187,7 @@ export class User {
         })
 
       const repository = getRepository(User)
-      this.domain = Promise.resolve(foundDomain)
+      this.domain = foundDomain
       await repository.save(this)
     }
 

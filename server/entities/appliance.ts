@@ -1,6 +1,15 @@
 import { Domain } from '@things-factory/domain-base'
 import { Field, ID, ObjectType } from 'type-graphql'
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm'
 import { User } from './user'
 
 @ObjectType()
@@ -8,7 +17,7 @@ import { User } from './user'
 @Index('ix_appliance_0', (appliance: Appliance) => [appliance.domain, appliance.name, appliance.applianceId], {
   unique: true
 })
-export class Appliance {
+export class Appliance extends BaseEntity {
   @Field(type => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -41,9 +50,15 @@ export class Appliance {
   @Column({ nullable: true })
   description?: string
 
+  @Column()
+  creatorId?: string
+
   @Field(type => User, { nullable: true })
   @ManyToOne(type => User, { nullable: true })
   creator?: User
+
+  @Column()
+  updaterId?: string
 
   @Field(type => User, { nullable: true })
   @ManyToOne(type => User, { nullable: true })
@@ -56,4 +71,8 @@ export class Appliance {
   @Field(type => Date)
   @UpdateDateColumn()
   updatedAt: Date
+
+  static async findUserBatch(ids: string[]) {
+    return User.findByIds(ids)
+  }
 }

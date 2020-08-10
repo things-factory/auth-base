@@ -1,6 +1,7 @@
 import { Domain } from '@things-factory/domain-base'
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ID, ObjectType, InputType } from 'type-graphql'
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -13,12 +14,13 @@ import {
 import { Role } from './role'
 import { User } from './user'
 
+@InputType('PrivilegeInput')
 @ObjectType()
-@Entity('priviledges')
-@Index('ix_priviledge_0', (priviledge: Priviledge) => [priviledge.domain, priviledge.name, priviledge.category], {
+@Entity('privileges')
+@Index('ix_privilege_0', (privilege: Privilege) => [privilege.domain, privilege.name, privilege.category], {
   unique: true
 })
-export class Priviledge {
+export class Privilege extends BaseEntity {
   @Field(type => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -40,7 +42,7 @@ export class Priviledge {
   description?: string
 
   @Field(type => [Role])
-  @ManyToMany(type => Role, role => role.priviledges)
+  @ManyToMany(type => Role, role => role.privileges)
   roles: Role[]
 
   @Field(type => User, { nullable: true })

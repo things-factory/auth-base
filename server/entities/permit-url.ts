@@ -1,12 +1,21 @@
 import { Domain } from '@things-factory/domain-base'
-import { Field, ID, ObjectType } from 'type-graphql'
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import { Field, ID, ObjectType, InputType } from 'type-graphql'
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  BaseEntity
+} from 'typeorm'
 import { User } from './user'
 
 @ObjectType()
 @Entity()
 @Index('ix_permit_url_0', (permitUrl: PermitUrl) => [permitUrl.domain, permitUrl.name], { unique: true })
-export class PermitUrl {
+export class PermitUrl extends BaseEntity {
   @Field(type => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string

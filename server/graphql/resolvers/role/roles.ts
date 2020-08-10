@@ -9,7 +9,7 @@ export const rolesResolver = {
     const [items, total] = await queryBuilder
       .leftJoinAndSelect('Role.domain', 'Domain')
       .leftJoinAndSelect('Role.users', 'Users')
-      .leftJoinAndSelect('Role.priviledges', 'Priviledges')
+      .leftJoinAndSelect('Role.privileges', 'Privileges')
       .leftJoinAndSelect('Role.creator', 'Creator')
       .leftJoinAndSelect('Role.updater', 'Updater')
       .getManyAndCount()

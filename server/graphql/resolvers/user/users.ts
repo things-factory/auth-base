@@ -10,7 +10,7 @@ export const usersResolver = {
       .leftJoinAndSelect('User.roles', 'Roles')
       .leftJoinAndSelect('User.domain', 'Domain')
       .leftJoinAndSelect('User.domains', 'Domains')
-      .leftJoinAndSelect('Roles.priviledges', 'Priviledges')
+      .leftJoinAndSelect('Roles.privileges', 'Privileges')
       .leftJoinAndSelect('Roles.users', 'Users')
       .getManyAndCount()
 

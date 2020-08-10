@@ -1,6 +1,6 @@
 export * from './appliance'
 export * from './permit-url'
-export * from './priviledge'
+export * from './privilege'
 export * from './role'
 export * from './user'
 export * from './user-history'

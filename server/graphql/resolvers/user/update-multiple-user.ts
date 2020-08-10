@@ -1,11 +1,13 @@
 import { getConnection } from 'typeorm'
 import { User } from '../../../entities'
+import { Domain } from '@things-factory/domain-base'
 
 export const updateMultipleUser = {
   async updateMultipleUser(_: any, { patches }, context: any) {
     let results = []
     const _createRecords = patches.filter((patch: any) => patch.cuFlag.toUpperCase() === '+')
     const _updateRecords = patches.filter((patch: any) => patch.cuFlag.toUpperCase() === 'M')
+    const currentDomain = await Domain.findOne({ subdomain: context.state.domain })
 
     await getConnection().transaction(async txManager => {
       const userRepo = txManager.getRepository(User)
@@ -16,8 +18,7 @@ export const updateMultipleUser = {
           const result = await userRepo.save({
             ...newRecord,
             password: User.encode(newRecord.password),
-            // domain: Promise.resolve(newRecord.domain || context.state.domain),
-            domain: newRecord.domain || context.state.domain,
+            domain: newRecord.domain || currentDomain,
             creator: context.state.user,
             updater: context.state.user
           })
@@ -27,7 +28,7 @@ export const updateMultipleUser = {
             .createQueryBuilder()
             .update('users')
             .set({
-              domain: (newRecord.domain || context.state.domain).id
+              domain: (newRecord.domain || currentDomain).id
             })
             .where({
               id: result.id

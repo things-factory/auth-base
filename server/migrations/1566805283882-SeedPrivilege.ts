@@ -1,8 +1,8 @@
 import { Domain } from '@things-factory/domain-base'
 import { getRepository, MigrationInterface, QueryRunner } from 'typeorm'
-import { Priviledge } from '../entities'
+import { Privilege } from '../entities'
 
-const SEEDS_PRIVILEDGES = [
+const SEEDS_PRIVILEGES = [
   {
     name: 'query',
     category: 'user',
@@ -15,7 +15,7 @@ const SEEDS_PRIVILEDGES = [
   }
 ]
 
-export class SeedPriviledge1566805283882 implements MigrationInterface {
+export class SeedPrivilege1566805283882 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     const domains = await getRepository(Domain).find()
 
@@ -23,12 +23,12 @@ export class SeedPriviledge1566805283882 implements MigrationInterface {
       for (let i = 0; i < domains.length; i++) {
         const domain = domains[i]
 
-        for (let j = 0; j < SEEDS_PRIVILEDGES.length; j++) {
-          const priviledge: any = SEEDS_PRIVILEDGES[j]
-          priviledge.domain = domain
+        for (let j = 0; j < SEEDS_PRIVILEGES.length; j++) {
+          const privilege: any = SEEDS_PRIVILEGES[j]
+          privilege.domain = domain
 
-          await getRepository(Priviledge).save({
-            ...priviledge
+          await getRepository(Privilege).save({
+            ...privilege
           })
         }
       }
@@ -38,10 +38,10 @@ export class SeedPriviledge1566805283882 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    const repository = getRepository(Priviledge)
+    const repository = getRepository(Privilege)
 
-    SEEDS_PRIVILEDGES.reverse().forEach(async priviledge => {
-      let record = await repository.findOne({ name: priviledge.name })
+    SEEDS_PRIVILEGES.reverse().forEach(async privilege => {
+      let record = await repository.findOne({ name: privilege.name })
       await repository.remove(record)
     })
   }

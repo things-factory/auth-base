@@ -1,12 +1,21 @@
 import { Domain } from '@things-factory/domain-base'
 import { Field, ID, ObjectType } from 'type-graphql'
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  BaseEntity
+} from 'typeorm'
 import { User } from './user'
 
 @ObjectType()
 @Entity()
 @Index('ix_user_histories_0', (userHistory: UserHistory) => [userHistory.domain, userHistory.id], { unique: true })
-export class UserHistory {
+export class UserHistory extends BaseEntity {
   @Field(type => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string

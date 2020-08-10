@@ -10,7 +10,7 @@ export async function checkin({ userId, domainName }) {
   const domain = domains.find(domain => domain.subdomain == domainName)
   if (!domain) return false
 
-  user.domain = Promise.resolve(domain)
+  user.domain = domain
   await userRepo.save(user)
 
   return await user.sign()

@@ -1,19 +1,19 @@
 import { getRepository } from 'typeorm'
-import { Priviledge, Role } from '../../../entities'
+import { Privilege, Role } from '../../../entities'
 
 export const updateRole = {
   async updateRole(_: any, { id, patch }, context: any) {
     const repository = getRepository(Role)
     const role = await repository.findOne({
       where: { id },
-      relations: ['domain', 'priviledges', 'creator', 'updater']
+      relations: ['domain', 'privileges', 'creator', 'updater']
     })
 
-    const priviledgeIds = role.priviledges.map(priviledge => priviledge.id)
-    if (patch.priviledges && patch.priviledges.length) {
-      patch.priviledges.forEach((priviledgeId: string) => {
-        if (!priviledgeIds.includes(priviledgeId)) {
-          priviledgeIds.push(priviledgeId)
+    const privilegeIds = role.privileges.map(privilege => privilege.id)
+    if (patch.privileges && patch.privileges.length) {
+      patch.privileges.forEach((privilegeId: string) => {
+        if (!privilegeIds.includes(privilegeId)) {
+          privilegeIds.push(privilegeId)
         }
       })
     }
@@ -21,8 +21,8 @@ export const updateRole = {
     return await repository.save({
       ...role,
       ...patch,
-      priviledges: await getRepository(Priviledge).findByIds(
-        patch.priviledges.map((priviledge: Priviledge) => priviledge.id)
+      privileges: await getRepository(Privilege).findByIds(
+        patch.privileges.map((privilege: Privilege) => privilege.id)
       ),
       updater: context.state.user
     })

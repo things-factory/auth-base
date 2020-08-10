@@ -51,7 +51,7 @@ export async function authcheck({ id, domain }) {
       domains
     })
   else {
-    user.domain = Promise.resolve(foundDomain)
+    user.domain = foundDomain
     await repository.save(user)
   }
   // return true

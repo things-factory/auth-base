@@ -1,5 +1,5 @@
 import { Field, InputType } from 'type-graphql'
-import { Role, User, Priviledge } from '../../../entities'
+import { Role, User, Privilege } from '../../../entities'
 import { Domain } from '@things-factory/domain-base'
 
 @InputType()
@@ -10,8 +10,8 @@ export class NewRole extends Role {
   name: string
   @Field(type => [User])
   users: User[]
-  @Field(type => [Priviledge])
-  priviledges: Priviledge[]
+  @Field(type => [Privilege])
+  privileges: Privilege[]
   @Field({ nullable: true })
   description?: string
 }

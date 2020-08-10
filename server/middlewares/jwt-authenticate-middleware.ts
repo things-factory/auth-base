@@ -37,20 +37,6 @@ export async function jwtAuthenticateMiddleware(context, next) {
   return await passport.authenticate('jwt', { session: false }, async (err, user, info) => {
     if (err || !user) {
       context.state.error = err || info
-
-      if (
-        context.method == 'POST'
-        // ||
-        // (context._matchedRoute == context.path &&
-        //   (context.get('sec-fetch-mode') == 'navigate' || context.get('sec-fetch-dest') == 'document'))
-      ) {
-        context.status = 401
-        context.body = {
-          success: false,
-          message: info.message
-        }
-        return
-      }
       // if (context.header['sec-fetch-mode'] && context.header['sec-fetch-mode'] != 'navigate') {
       //   context.throw(401, {
       //     success: false,

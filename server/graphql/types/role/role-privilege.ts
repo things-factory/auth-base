@@ -1,8 +1,8 @@
 import { Field, InputType } from 'type-graphql'
-import { Priviledge, Role } from '../../../entities'
+import { Privilege, Role } from '../../../entities'
 
 @InputType()
-export class RolePriviledge implements Partial<Role>, Partial<Priviledge> {
+export class RolePrivilege implements Partial<Role>, Partial<Privilege> {
   @Field()
   name: string
   @Field({ nullable: true })

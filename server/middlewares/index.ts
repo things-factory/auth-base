@@ -1,7 +1,9 @@
 import passport from 'koa-passport'
 import unless from 'koa-unless'
 import { jwtAuthenticateMiddleware } from './jwt-authenticate-middleware'
+import { checkUserMiddleware } from './check-user-middleware'
 ;(jwtAuthenticateMiddleware as any).unless = unless
+;(checkUserMiddleware as any).unless = unless
 
 var graphqlAuthMiddleware = async (context, next) => {
   try {
@@ -27,7 +29,8 @@ process.on('bootstrap-module-middleware' as any, app => {
     path: [new RegExp(`^(?!\/?(${AUTH_CHECK_URLS.join('|')})(?![^/]))`)]
   }
   ;(app as any).use(passport.initialize())
-  ;(app as any).use((jwtAuthenticateMiddleware as any).unless(unlessOption))
+  ;(app as any).use(jwtAuthenticateMiddleware as any)
+  ;(app as any).use((checkUserMiddleware as any).unless(unlessOption))
   // ;(app as any).use((graphqlAuthMiddleware as any).unless(unlessOption))
 })
 
