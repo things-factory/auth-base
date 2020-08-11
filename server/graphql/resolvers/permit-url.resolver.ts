@@ -1,3 +1,4 @@
+import { Domain } from '@things-factory/domain-base'
 import { buildQuery, ListParam, PaginatedResponse } from '@things-factory/graphql-utils'
 import { Context } from 'koa'
 import { Arg, Args, Ctx, Mutation, Query, Resolver } from 'type-graphql'
@@ -13,38 +14,46 @@ type PaginatedPermitUrlResponse = InstanceType<typeof PaginatedPermitUrlResponse
 @Service()
 @Resolver(of => PermitUrl)
 export class PermitUrlResolver {
-  constructor(@InjectRepository(PermitUrl) private readonly PermitUrlRepository: Repository<PermitUrl>) {}
+  constructor(@InjectRepository(PermitUrl) private readonly permitUrlRepository: Repository<PermitUrl>) {}
   @Query(returns => PermitUrl)
-  async PermitUrl(@Arg('name') name: string, @Ctx() context: Context & Record<string, any>) {
-    return this.PermitUrlRepository.findOne({
-      where: { PermitUrl: context.state.PermitUrl, name }
+  async permitUrl(@Arg('name') name: string, @Ctx() context: Context & Record<string, any>) {
+    if (!context.state.domainEntity) {
+      context.state.domainEntity = await Domain.findOne({ subdomain: context.state.domain })
+    }
+
+    return PermitUrl.findOne({
+      where: { domain: context.state.domainEntity, name }
     })
   }
+
   @Query(returns => PaginatedPermitUrlResponse)
-  async PermitUrls(@Args() params: ListParam, @Ctx() context: Context & Record<string, any>) {
-    const queryBuilder = this.PermitUrlRepository.createQueryBuilder()
+  async permitUrls(@Args() params: ListParam, @Ctx() context: Context & Record<string, any>) {
+    const queryBuilder = PermitUrl.createQueryBuilder()
     buildQuery(queryBuilder, params, context, false)
     const [items, total] = await queryBuilder.getManyAndCount()
     return { items, total }
   }
+
   @Mutation(returns => PermitUrl)
-  async createPermitUrl(@Arg('permitUrl') PermitUrl: NewPermitUrl) {
-    return this.PermitUrlRepository.save(PermitUrl)
+  async createPermitUrl(@Arg('permitUrl') permitUrl: NewPermitUrl) {
+    const createPermitUrl = new PermitUrl()
+    Object.assign(createPermitUrl, permitUrl)
+    return createPermitUrl.save()
   }
+
   @Mutation(returns => [PermitUrl])
   async deletePermitUrl(@Arg('name') name: string) {
-    const willDelete = this.PermitUrlRepository.find({ name })
-    await this.PermitUrlRepository.delete({ name })
+    const willDelete = await PermitUrl.find({ name })
+    const deleted = await PermitUrl.delete({ name })
     return willDelete
   }
+
   @Mutation(returns => PermitUrl)
   async updatePermitUrl(@Arg('name') name: string, @Arg('patch') patch: PermitUrlPatch) {
-    const repository = this.PermitUrlRepository
-    const PermitUrl = await repository.findOne({ name })
-    return await repository.save({
-      ...PermitUrl,
-      ...patch
-    })
+    const permitUrl = await PermitUrl.findOne({ name })
+    Object.assign(permitUrl, patch)
+
+    return await permitUrl.save()
   }
   // @Mutation(returns => PermitUrl)
   // @Authorized()
