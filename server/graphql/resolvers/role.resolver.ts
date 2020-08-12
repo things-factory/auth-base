@@ -66,7 +66,7 @@ export class RoleResolver {
     return willDelete.remove()
   }
   @Mutation(returns => [Role])
-  async deleteRoles(@Arg('id') ids: string[], @Ctx() context: Context & Record<string, any>) {
+  async deleteRoles(@Arg('ids', type => [String]) ids: string[], @Ctx() context: Context & Record<string, any>) {
     const willDelete = await Role.findByIds(ids)
     return Role.remove(willDelete)
   }
