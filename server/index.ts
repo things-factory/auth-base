@@ -8,3 +8,5 @@ import './routes'
 export * from './middlewares'
 export * from './routes'
 export * from './router'
+
+export * from './utils/get-secret'

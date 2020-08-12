@@ -17,15 +17,8 @@ import {
 import { AuthError } from '../errors/auth-error'
 import { DomainError } from '../errors/user-domain-not-match-error'
 import { Role } from './role'
+import { SECRET } from '../utils/get-secret'
 
-var SECRET = config.get('SECRET')
-if (!SECRET) {
-  if (process.env.NODE_ENV == 'production') {
-    throw new TypeError('SECRET key not configured.')
-  } else {
-    SECRET = '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95'
-  }
-}
 const ORMCONFIG = config.get('ormconfig', {})
 const DATABASE_TYPE = ORMCONFIG.type
 
@@ -75,7 +68,7 @@ export class User {
   @Column({
     nullable: true
   })
-  userType: string // default: 'user, enum: 'user', 'admin'
+  userType: string // default: 'user', enum: 'user', 'admin', 'application', 'appliance'
 
   @Column({
     nullable: true
@@ -117,7 +110,9 @@ export class User {
       id: this.id,
       userType: this.userType,
       status: this.status,
-      domain: await this.domain
+      domain: {
+        subdomain: (await this.domain)?.subdomain
+      }
     }
 
     return await jwt.sign(user, SECRET, {
