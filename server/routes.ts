@@ -1,4 +1,3 @@
-import { config } from '@things-factory/env'
 import koaBodyParser from 'koa-bodyparser'
 import { getRepository } from 'typeorm'
 import { MAX_AGE } from './constants/max-age'
@@ -8,8 +7,6 @@ import { unlockAccount } from './controllers/unlock-account'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
 import { domainRouter, secureRouter, signinRouter } from './router'
-
-const SECRET = config.get('SECRET', '0xD58F835B69D207A76CC5F84a70a1D0d4C79dAC95')
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
   var paths = [
