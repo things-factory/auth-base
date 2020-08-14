@@ -10,3 +10,4 @@ export * from './routes'
 export * from './router'
 
 export * from './utils/get-secret'
+export * from './errors'
