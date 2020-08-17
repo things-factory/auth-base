@@ -10,9 +10,9 @@ passport.use(
       secretOrKey: SECRET,
       //we expect the user to send the token as a query parameter with the name 'secret_token'
       jwtFromRequest: ExtractJwt.fromExtractors([
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
         ExtractJwt.fromHeader('authorization'),
         ExtractJwt.fromHeader('x-access-token'),
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
         ExtractJwt.fromUrlQueryParameter('access_token'),
         ExtractJwt.fromBodyField('access_token'),
         req => {
@@ -64,16 +64,9 @@ export async function jwtAuthenticateMiddleware(context, next) {
         const userEntity = await User.checkAuth(user)
         context.state.user = userEntity
       } catch (e) {
-        if (context.method == 'POST') {
-          context.status = 401
-          context.body = {
-            success: false,
-            message: e.toString()
-          }
-          return
-        }
+      } finally {
+        await next()
       }
-      await next()
     }
   })(context, next)
 }
