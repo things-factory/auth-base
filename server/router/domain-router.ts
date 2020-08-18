@@ -44,7 +44,7 @@ async function domainCheck(context, next) {
 }
 
 domainRouter
-  .get('*', async (context, next) => {
+  .get('(.*)', async (context, next) => {
     return await next()
   })
   .get('/', jwtAuthenticateMiddleware, async (context, next) => {
@@ -55,7 +55,7 @@ domainRouter
     if (!context.state.user) return context.redirect('/signin')
     return await domainCheck(context, next)
   })
-  .get('/domain/:domainName/*', jwtAuthenticateMiddleware, async (context, next) => {
+  .get('/domain/:domainName/(.*)', jwtAuthenticateMiddleware, async (context, next) => {
     if (!context.state.user) return context.redirect('/signin')
     return await domainCheck(context, next)
   })
