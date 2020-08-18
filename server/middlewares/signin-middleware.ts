@@ -46,15 +46,15 @@ export async function signinMiddleware(context, next) {
 
       await next()
     } else {
-      const reqBody = context.request.body
-      const { secure } = context
+      // const reqBody = context.request.body
+      // const { secure } = context
       const { user: userInfo, token, domains } = user
 
-      let responseObj = {
-        message: 'signin successfully',
-        token,
-        domains
-      }
+      // let responseObj = {
+      //   message: 'signin successfully',
+      //   token,
+      //   domains
+      // }
 
       context.state.user = userInfo
       context.state.token = token

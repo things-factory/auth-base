@@ -3,7 +3,6 @@ import Router from 'koa-router'
 import { getRepository } from 'typeorm'
 import { MAX_AGE } from '../constants/max-age'
 import { changePwd } from '../controllers/change-pwd'
-import { checkin } from '../controllers/checkin'
 import { deleteAccount } from '../controllers/delete-account'
 import { updateProfile } from '../controllers/profile'
 import { User } from '../entities'
@@ -20,14 +19,6 @@ const bodyParserOption = {
 }
 
 secureRouter
-  .get('/default-domain', async (context, next) => {
-    const { user } = context.state
-    if (!user) return context.redirect('/signin')
-
-    const domain = await user.domain
-    if (!domain) return context.redirect('/domain-select')
-    return context.redirect(`/domain/${domain.subdomain}`)
-  })
   .get('/signin', async (context, next) => {
     try {
       const { query } = context
@@ -52,53 +43,6 @@ secureRouter
         elementScript: '/signin.js',
         data: {}
       })
-    }
-  })
-  .get('/domain-select', async (context, next) => {
-    const { secure } = context
-    const { user } = context.state
-    try {
-      if (!user) return context.redirect('/signin')
-      const domains = await user.domains
-
-      await context.render('auth-page', {
-        pageElement: 'auth-domain-select',
-        elementScript: '/domain-select.js',
-        data: {
-          domains
-        }
-      })
-    } catch (e) {
-      context.cookies.set('access_token', '', {
-        secure,
-        httpOnly: true
-      })
-      context.redirect('/signin')
-    }
-  })
-  .get('/checkin/:domainName', async (context, next) => {
-    try {
-      const { params, secure } = context
-      const { domainName } = params
-      const { user } = context.state
-
-      const newToken = await checkin({
-        userId: user.id,
-        domainName
-      })
-
-      if (newToken) {
-        context.cookies.set('access_token', newToken, {
-          secure,
-          httpOnly: true,
-          maxAge: MAX_AGE
-        })
-        context.redirect(`/domain/${domainName}`)
-      } else {
-        context.redirect('/domain-select')
-      }
-    } catch (e) {
-      context.redirect('/domain-select')
     }
   })
   .post('/change_pass', koaBodyParser(bodyParserOption), async (context, next) => {
