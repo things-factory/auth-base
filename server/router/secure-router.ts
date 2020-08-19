@@ -9,7 +9,15 @@ import { User } from '../entities'
 import { jwtAuthenticateMiddleware } from '../middlewares'
 import { getDefaultDomain } from '../utils/default-domain'
 
+import { config } from '@things-factory/env'
+import { domainMiddleware } from '@things-factory/shell'
+
+const useSubdomain = config.get('subdomainOffset', 1000) != 1000
+const debug = require('debug')('things-factory:auth-base:secure-router')
+
 export const secureRouter = new Router()
+
+secureRouter.use(domainMiddleware)
 secureRouter.use(jwtAuthenticateMiddleware)
 
 const bodyParserOption = {
@@ -22,17 +30,26 @@ secureRouter
   .get('/signin', async (context, next) => {
     try {
       const { query } = context
-      const { user } = context.state
+      const { user, domain } = context.state
       const { redirect_to } = query
+
+      debug('/signin', useSubdomain, user, domain)
       // check signed in
-      if (!user)
-        return await context.render('auth-page', {
+      if (!user || (useSubdomain && !domain)) {
+        await context.render('auth-page', {
           pageElement: 'auth-signin',
           elementScript: '/signin.js',
           data: {
             redirectTo: redirect_to
           }
         })
+        return
+      }
+
+      if (useSubdomain && domain) {
+        context.redirect(redirect_to)
+        return
+      }
 
       const redirectTo = await getDefaultDomain(user)
 

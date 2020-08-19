@@ -7,6 +7,7 @@ import { jwtAuthenticateMiddleware } from '../middlewares'
 import { MAX_AGE } from '../constants/max-age'
 
 export const domainRouter = new Router()
+domainRouter.use(jwtAuthenticateMiddleware)
 
 const bodyParserOption = {
   formLimit: '10mb',
@@ -44,22 +45,22 @@ async function domainCheck(context, next) {
 }
 
 domainRouter
-  .get('(.*)', async (context, next) => {
-    return await next()
-  })
-  .get('/', jwtAuthenticateMiddleware, async (context, next) => {
+  // .get('(.*)', async (context, next) => {
+  //   return await next()
+  // })
+  .get('/', async (context, next) => {
     if (!context.state.user) return context.redirect('/signin')
     return context.redirect('/default-domain')
   })
-  .get('/domain/:domainName', jwtAuthenticateMiddleware, async (context, next) => {
+  .get('/domain/:domainName', async (context, next) => {
     if (!context.state.user) return context.redirect('/signin')
     return await domainCheck(context, next)
   })
-  .get('/domain/:domainName/(.*)', jwtAuthenticateMiddleware, async (context, next) => {
+  .get('/domain/:domainName/(.*)', async (context, next) => {
     if (!context.state.user) return context.redirect('/signin')
     return await domainCheck(context, next)
   })
-  .get('/default-domain', jwtAuthenticateMiddleware, async (context, next) => {
+  .get('/default-domain', async (context, next) => {
     const { user } = context.state
     if (!user) return context.redirect('/signin')
 
@@ -67,7 +68,7 @@ domainRouter
     if (!domain) return context.redirect('/domain-select')
     return context.redirect(`/domain/${domain.subdomain}`)
   })
-  .get('/domain-select', jwtAuthenticateMiddleware, async (context, next) => {
+  .get('/domain-select', async (context, next) => {
     const { secure } = context
     const { user } = context.state
     try {
@@ -89,7 +90,7 @@ domainRouter
       context.redirect('/signin')
     }
   })
-  .get('/checkin/:domainName', jwtAuthenticateMiddleware, async (context, next) => {
+  .get('/checkin/:domainName', async (context, next) => {
     try {
       const { params, secure } = context
       const { domainName } = params

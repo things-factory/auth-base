@@ -1,14 +1,10 @@
-import Router from 'koa-router'
 import { User } from '../entities'
-import { AuthError } from '../errors/auth-error'
 import { getToken } from '../utils/get-token'
-import { jwtAuthenticateMiddleware } from '../middlewares'
+import { AuthError } from '../errors/auth-error'
 
-const debug = require('debug')('things-factory:auth-base:subdomain-router')
+const debug = require('debug')('things-factory:auth-base:subdomain-middleware')
 
-export const subdomainRouter = new Router()
-
-async function domainCheck(context, next) {
+export async function subdomainMiddleware(context: any, next: any) {
   try {
     const { domain } = context.state
     debug('context.domain', domain)
@@ -33,6 +29,8 @@ async function domainCheck(context, next) {
 
     const { domain: tokenDomain } = decoded as any
     if (tokenDomain.subdomain != domain.subdomain) {
+      debug('subdomain mismatch', tokenDomain.subdomain, domain.subdomain)
+
       context.redirect(`/signin?redirect_to=${context.originalUrl}`)
       return
     }
@@ -43,8 +41,3 @@ async function domainCheck(context, next) {
     return
   }
 }
-
-subdomainRouter.get('/(.*)', jwtAuthenticateMiddleware, async (context, next) => {
-  if (!context.state.user) return context.redirect('/signin')
-  return await domainCheck(context, next)
-})

@@ -6,7 +6,11 @@ import { signup } from './controllers/signup'
 import { unlockAccount } from './controllers/unlock-account'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
-import { domainRouter, secureRouter, signinRouter } from './router'
+import { domainRouter, secureRouter, signinRouter, subdomainRouter } from './router'
+import { config } from '@things-factory/env'
+import { subdomainMiddleware } from './router/subdomain-middleware'
+
+const debug = require('debug')('things-factory:auth-base:routes')
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
   var paths = [
@@ -30,19 +34,25 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
     // 'domain'
   ]
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
-
-  app.use(domainRouter.routes())
 })
 
-process.on('bootstrap-module-route' as any, (app, routes) => {
+process.on('bootstrap-module-secure-route' as any, (app, routes) => {
+  if (config.get('subdomainOffset')) {
+    routes.use(subdomainMiddleware)
+  } else {
+    routes.use(domainRouter.routes())
+  }
+
+  app.use(secureRouter.routes())
+  app.use(signinRouter.routes())
+})
+
+process.on('bootstrap-module-public-route' as any, (app, routes) => {
   const bodyParserOption = {
     formLimit: '10mb',
     jsonLimit: '10mb',
     textLimit: '10mb'
   }
-
-  app.use(secureRouter.routes())
-  app.use(signinRouter.routes())
 
   // static pages
   routes.get('/signup', async (context, next) => {
@@ -61,6 +71,7 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
     context.cookies.set('access_token', '', {
       httpOnly: true
     })
+    debug('/signout:get')
 
     context.redirect('/')
   })
@@ -160,6 +171,8 @@ process.on('bootstrap-module-route' as any, (app, routes) => {
       context.body = {
         message: 'signout successfully'
       }
+
+      debug('/signout:post')
 
       context.cookies.set('access_token', '', {
         httpOnly: true
