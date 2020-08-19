@@ -44,7 +44,7 @@ export class SeedUsers1525758367829 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<any> {
     const repository = getRepository(User)
 
-    Promise.all(
+    return Promise.all(
       SEED_USERS.reverse().map(async user => {
         let record = await repository.findOne({ email: user.email })
         await repository.remove(record)
