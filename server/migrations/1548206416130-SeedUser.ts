@@ -22,31 +22,33 @@ export class SeedUsers1525758367829 implements MigrationInterface {
     const repository = getRepository(User)
     const domain = await getRepository(Domain).findOne({ where: { name: 'SYSTEM' } })
 
-    try {
-      for (let i = 0; i < SEED_USERS.length; i++) {
-        const user = SEED_USERS[i]
-        const u = await repository.save({
-          // domain, /* domain은 사용자 생성시 설정될 필요 없음 */
+    return Promise.all(
+      SEED_USERS.map(async user => {
+        await repository.save({
           ...user,
           password: User.encode(user.password)
         })
 
-        const userId = u.id
-        const domainId = (domain as any).id
+        const userFetch = await repository.findOne({
+          email: user.email
+        })
 
-        await queryRunner.query(`insert into users_domains values('${userId}', '${domainId}')`)
-      }
-    } catch (e) {
-      console.error(e)
-    }
+        userFetch.domain = Promise.resolve(domain)
+        userFetch.domains = Promise.resolve([domain])
+
+        await repository.save(userFetch)
+      })
+    )
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
     const repository = getRepository(User)
 
-    SEED_USERS.reverse().forEach(async user => {
-      let record = await repository.findOne({ email: user.email })
-      await repository.remove(record)
-    })
+    Promise.all(
+      SEED_USERS.reverse().map(async user => {
+        let record = await repository.findOne({ email: user.email })
+        await repository.remove(record)
+      })
+    )
   }
 }

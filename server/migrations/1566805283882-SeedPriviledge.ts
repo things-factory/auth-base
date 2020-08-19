@@ -40,7 +40,7 @@ export class SeedPriviledge1566805283882 implements MigrationInterface {
       domains.map(async domain =>
         Promise.all(
           SEEDS_PRIVILEDGES.map(async (priviledge: Priviledge) => {
-            await getRepository(Priviledge).delete({
+            await getRepository(Priviledge).remove({
               ...priviledge,
               domain
             })
