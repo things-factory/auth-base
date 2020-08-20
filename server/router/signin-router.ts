@@ -3,9 +3,7 @@ import { MAX_AGE } from '../constants/max-age'
 import { signinMiddleware } from '../middlewares'
 import { getDefaultDomain } from '../utils/default-domain'
 import { domainMiddleware } from '@things-factory/shell'
-import { config } from '@things-factory/env'
 
-const useSubdomain = config.get('subdomainOffset', 1000) != 1000
 const debug = require('debug')('things-factory:auth-base:signin-router')
 
 export const signinRouter = new Router()
@@ -40,6 +38,13 @@ signinRouter.post('/signin', async (context, next) => {
     })
   }
 
+  if ('x-only-token' in header) {
+    context.body = token
+    return
+  }
+
+  var redirectTo
+
   if (domain) {
     const domains = await user.domains
     if (!domains.find(d => d.subdomain == domain.subdomain)) {
@@ -56,18 +61,18 @@ signinRouter.post('/signin', async (context, next) => {
         }
       })
     }
-  }
 
-  if ('x-only-token' in header) {
-    context.body = token
+    redirectTo = reqBody.redirect_to || '/'
   } else {
-    const redirectTo = reqBody.redirect_to || (useSubdomain ? '/' : await getDefaultDomain(user))
-    context.cookies.set('access_token', token, {
-      secure,
-      httpOnly: true,
-      maxAge: MAX_AGE
-    })
-
-    context.redirect(redirectTo)
+    redirectTo = await getDefaultDomain(user)
   }
+
+  context.cookies.set('access_token', token, {
+    secure,
+    httpOnly: true,
+    maxAge: MAX_AGE
+  })
+
+  debug('/signin:post', redirectTo)
+  context.redirect(redirectTo)
 })

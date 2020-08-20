@@ -6,9 +6,8 @@ import { signup } from './controllers/signup'
 import { unlockAccount } from './controllers/unlock-account'
 import { resendVerificationEmail, verify } from './controllers/verification'
 import { User } from './entities'
-import { domainRouter, secureRouter, signinRouter, subdomainRouter } from './router'
-import { config } from '@things-factory/env'
-import { subdomainMiddleware } from './router/subdomain-middleware'
+import { domainRouter, secureRouter, signinRouter } from './router'
+import { subdomainMiddleware } from './middlewares'
 
 const debug = require('debug')('things-factory:auth-base:routes')
 
@@ -37,11 +36,8 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
 })
 
 process.on('bootstrap-module-secure-route' as any, (app, routes) => {
-  if (config.get('subdomainOffset')) {
-    routes.use(subdomainMiddleware)
-  } else {
-    routes.use(domainRouter.routes())
-  }
+  routes.use(subdomainMiddleware)
+  routes.use(domainRouter.routes())
 
   app.use(secureRouter.routes())
   app.use(signinRouter.routes())

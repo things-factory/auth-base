@@ -7,12 +7,12 @@ import { deleteAccount } from '../controllers/delete-account'
 import { updateProfile } from '../controllers/profile'
 import { User } from '../entities'
 import { jwtAuthenticateMiddleware } from '../middlewares'
-import { getDefaultDomain } from '../utils/default-domain'
+import { checkin } from '../controllers/checkin'
 
 import { config } from '@things-factory/env'
 import { domainMiddleware } from '@things-factory/shell'
 
-const useSubdomain = config.get('subdomainOffset', 1000) != 1000
+const useSubdomain = !!config.get('subdomainOffset')
 const debug = require('debug')('things-factory:auth-base:secure-router')
 
 export const secureRouter = new Router()
@@ -33,9 +33,9 @@ secureRouter
       const { user, domain } = context.state
       const { redirect_to } = query
 
-      debug('/signin', useSubdomain, user, domain)
-      // check signed in
-      if (!user || (useSubdomain && !domain)) {
+      debug('/signin', user, domain)
+
+      if (!user) {
         await context.render('auth-page', {
           pageElement: 'auth-signin',
           elementScript: '/signin.js',
@@ -46,14 +46,13 @@ secureRouter
         return
       }
 
-      if (useSubdomain && domain) {
-        context.redirect(redirect_to)
+      if (!domain) {
+        debug('/signin redirect to /domain-select')
+        context.redirect('/domain-select')
         return
       }
 
-      const redirectTo = await getDefaultDomain(user)
-
-      context.redirect(redirectTo)
+      context.redirect(redirect_to)
     } catch (e) {
       await context.render('auth-page', {
         pageElement: 'auth-signin',
@@ -149,5 +148,70 @@ secureRouter
         message: e.message,
         domains: []
       }
+    }
+  })
+  .get('/default-domain', async (context, next) => {
+    const { user } = context.state
+
+    const domain = await user.domain
+    if (!domain) return context.redirect('/domain-select')
+    return context.redirect(`/domain/${domain.subdomain}`)
+  })
+  .get('/domain-select', async (context, next) => {
+    const { secure } = context
+    const { user } = context.state
+
+    debug('get:/domain-select', secure, user)
+    try {
+      const domains = await user.domains
+
+      await context.render('auth-page', {
+        pageElement: 'auth-domain-select',
+        elementScript: '/domain-select.js',
+        data: {
+          domains
+        }
+      })
+    } catch (e) {
+      context.cookies.set('access_token', '', {
+        secure,
+        httpOnly: true
+      })
+      context.redirect('/signin')
+    }
+  })
+  .get('/checkin/:domainName', async (context, next) => {
+    try {
+      const { params, secure } = context
+      const { domainName } = params
+      const { user } = context.state
+
+      const newToken = await checkin({
+        userId: user.id,
+        domainName
+      })
+
+      debug('get:/checken/:domainName', useSubdomain, user, newToken)
+
+      if (newToken) {
+        context.cookies.set('access_token', newToken, {
+          secure,
+          httpOnly: true,
+          maxAge: MAX_AGE
+        })
+
+        if (useSubdomain) {
+          const { protocol, host } = context
+          const redirectTo = `${protocol}://${domainName}.${host}/`
+          debug('get:/checkin/:domainName', protocol, host, redirectTo)
+          context.redirect(redirectTo)
+        } else {
+          context.redirect(`/domain/${domainName}`)
+        }
+      } else {
+        context.redirect('/domain-select')
+      }
+    } catch (e) {
+      context.redirect('/domain-select')
     }
   })
