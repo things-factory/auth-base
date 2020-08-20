@@ -13,12 +13,12 @@ import { config } from '@things-factory/env'
 import { domainMiddleware } from '@things-factory/shell'
 
 const useSubdomain = !!config.get('subdomainOffset')
-const debug = require('debug')('things-factory:auth-base:secure-router')
+const debug = require('debug')('things-factory:auth-base:auth-private-process-router')
 
-export const secureRouter = new Router()
+export const authPrivateProcessRouter = new Router()
 
-secureRouter.use(domainMiddleware)
-secureRouter.use(jwtAuthenticateMiddleware)
+authPrivateProcessRouter.use(domainMiddleware)
+authPrivateProcessRouter.use(jwtAuthenticateMiddleware)
 
 const bodyParserOption = {
   formLimit: '10mb',
@@ -26,7 +26,7 @@ const bodyParserOption = {
   textLimit: '10mb'
 }
 
-secureRouter
+authPrivateProcessRouter
   .get('/signin', async (context, next) => {
     try {
       const { query } = context
@@ -191,7 +191,7 @@ secureRouter
         domainName
       })
 
-      debug('get:/checken/:domainName', useSubdomain, user, newToken)
+      debug('get:/checkin/:domainName', useSubdomain, user, newToken)
 
       if (newToken) {
         context.cookies.set('access_token', newToken, {

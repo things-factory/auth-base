@@ -4,19 +4,14 @@ import { signinMiddleware } from '../middlewares'
 import { getDefaultDomain } from '../utils/default-domain'
 import { domainMiddleware } from '@things-factory/shell'
 
-const debug = require('debug')('things-factory:auth-base:signin-router')
+const debug = require('debug')('things-factory:auth-base:auth-signin-passport-router')
 
-export const signinRouter = new Router()
-signinRouter.use(domainMiddleware)
-signinRouter.use(signinMiddleware)
+export const authSigninPassportRouter = new Router()
+authSigninPassportRouter.use(domainMiddleware)
+authSigninPassportRouter.use(signinMiddleware)
 
-const bodyParserOption = {
-  formLimit: '10mb',
-  jsonLimit: '10mb',
-  textLimit: '10mb'
-}
 // for authentication
-signinRouter.post('/signin', async (context, next) => {
+authSigninPassportRouter.post('/signin', async (context, next) => {
   const { secure, request } = context
   const { token, user, error, domain } = context.state
   const { body: reqBody, header } = request

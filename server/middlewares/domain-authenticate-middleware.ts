@@ -2,9 +2,9 @@ import { User } from '../entities'
 import { getToken } from '../utils/get-token'
 import { AuthError } from '../errors/auth-error'
 
-const debug = require('debug')('things-factory:auth-base:subdomain-middleware')
+const debug = require('debug')('things-factory:auth-base:domain-authenticate-middleware')
 
-export async function subdomainMiddleware(context: any, next: any) {
+export async function domainAuthenticateMiddleware(context: any, next: any) {
   try {
     const { domain } = context.state
     debug('context.domain', domain)

@@ -14,5 +14,5 @@ process.on('bootstrap-module-middleware' as any, app => {
 })
 
 export * from './jwt-authenticate-middleware'
+export * from './domain-authenticate-middleware'
 export * from './signin-middleware'
-export * from './subdomain-middleware'
