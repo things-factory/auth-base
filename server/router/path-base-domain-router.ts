@@ -9,13 +9,6 @@ const debug = require('debug')('things-factory:auth-base:domain-router')
 export const pathBaseDomainRouter = new Router()
 pathBaseDomainRouter.use(jwtAuthenticateMiddleware)
 
-// const bodyParserOption = {
-//   formLimit: '10mb',
-//   jsonLimit: '10mb',
-//   textLimit: '10mb'
-// }
-// for authentication
-
 // async function domainCheck(context, next) {
 //   try {
 //     const token = getToken(context)

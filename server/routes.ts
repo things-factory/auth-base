@@ -1,6 +1,5 @@
+import { jwtAuthenticateMiddleware, domainAuthenticateMiddleware } from './middlewares'
 import {
-  globalPrivateRouter,
-  domainPrivateRouter,
   authPublicProcessRouter,
   authPrivateProcessRouter,
   authSigninPassportRouter,
@@ -33,26 +32,28 @@ process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => 
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
 })
 
-process.on('bootstrap-module-domain-public-route' as any, (app, domainRouter) => {
+process.on('bootstrap-module-global-public-route' as any, (app, globalPublicRouter) => {
+  debug('bootstrap-module-global-public-route')
+
+  globalPublicRouter.use('', authPublicProcessRouter.routes(), authPublicProcessRouter.allowedMethods())
+})
+
+process.on('bootstrap-module-global-private-route' as any, (app, globalPrivateRouter) => {
+  globalPrivateRouter.use(jwtAuthenticateMiddleware)
+})
+
+process.on('bootstrap-module-domain-public-route' as any, (app, domainPublicRouter) => {
   debug('bootstrap-module-domain-public-route')
 
-  process.emit('bootstrap-module-domain-private-route' as any, app, domainPrivateRouter)
+  /* app based nested-routers */
+  domainPublicRouter.use('', authSigninPassportRouter.routes(), authSigninPassportRouter.allowedMethods())
+  domainPublicRouter.use('', authPrivateProcessRouter.routes(), authPrivateProcessRouter.allowedMethods())
+})
+
+process.on('bootstrap-module-domain-private-route' as any, (app, domainPrivateRouter) => {
+  domainPrivateRouter.use(jwtAuthenticateMiddleware)
+  domainPrivateRouter.use(domainAuthenticateMiddleware)
 
   /* domainPrivateRouter based nested-routers */
   domainPrivateRouter.use('/domain', pathBaseDomainRouter.routes(), pathBaseDomainRouter.allowedMethods())
-
-  /* app based nested-routers */
-  app.use(domainPrivateRouter.routes(), domainPrivateRouter.allowedMethods())
-  app.use(authSigninPassportRouter.routes(), authSigninPassportRouter.allowedMethods())
-  app.use(authPrivateProcessRouter.routes(), authPrivateProcessRouter.allowedMethods())
-})
-
-process.on('bootstrap-module-global-public-route' as any, (app, globalRouter) => {
-  debug('bootstrap-module-global-public-route')
-
-  process.emit('bootstrap-module-global-private-route' as any, app, globalPrivateRouter)
-
-  /* app based nested-routers */
-  app.use(globalPrivateRouter.routes(), globalPrivateRouter.allowedMethods())
-  app.use(authPublicProcessRouter.routes(), authPublicProcessRouter.allowedMethods())
 })

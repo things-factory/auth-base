@@ -1,4 +1,3 @@
-import koaBodyParser from 'koa-bodyparser'
 import Router from 'koa-router'
 import { getRepository } from 'typeorm'
 import { MAX_AGE } from '../constants/max-age'
@@ -10,21 +9,13 @@ import { jwtAuthenticateMiddleware } from '../middlewares'
 import { checkin } from '../controllers/checkin'
 
 import { config } from '@things-factory/env'
-import { domainMiddleware } from '@things-factory/shell'
 
 const useSubdomain = !!config.get('subdomainOffset')
 const debug = require('debug')('things-factory:auth-base:auth-private-process-router')
 
 export const authPrivateProcessRouter = new Router()
 
-authPrivateProcessRouter.use(domainMiddleware)
 authPrivateProcessRouter.use(jwtAuthenticateMiddleware)
-
-const bodyParserOption = {
-  formLimit: '10mb',
-  jsonLimit: '10mb',
-  textLimit: '10mb'
-}
 
 authPrivateProcessRouter
   .get('/signin', async (context, next) => {
@@ -61,7 +52,7 @@ authPrivateProcessRouter
       })
     }
   })
-  .post('/change_pass', koaBodyParser(bodyParserOption), async (context, next) => {
+  .post('/change_pass', async (context, next) => {
     try {
       let newPassword = context.request.body.new_pass
       const token = await changePwd(context.state.user, newPassword)
@@ -79,7 +70,7 @@ authPrivateProcessRouter
       throw new Error(e)
     }
   })
-  .post('/update-profile', koaBodyParser(bodyParserOption), async (context, next) => {
+  .post('/update-profile', async (context, next) => {
     try {
       let newProfiles = context.request.body
       await updateProfile(context.state.user, newProfiles)
@@ -91,7 +82,7 @@ authPrivateProcessRouter
       throw new Error(e)
     }
   })
-  .post('/delete-account', koaBodyParser(bodyParserOption), async (context, next) => {
+  .post('/delete-account', async (context, next) => {
     try {
       var { user } = context.state
       var { email: userEmail } = user

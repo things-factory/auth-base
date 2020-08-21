@@ -2,12 +2,11 @@ import Router from 'koa-router'
 import { MAX_AGE } from '../constants/max-age'
 import { signinMiddleware } from '../middlewares'
 import { getDefaultDomain } from '../utils/default-domain'
-import { domainMiddleware } from '@things-factory/shell'
 
 const debug = require('debug')('things-factory:auth-base:auth-signin-passport-router')
 
 export const authSigninPassportRouter = new Router()
-authSigninPassportRouter.use(domainMiddleware)
+
 authSigninPassportRouter.use(signinMiddleware)
 
 // for authentication

@@ -1,4 +1,3 @@
-import koaBodyParser from 'koa-bodyparser'
 import Router from 'koa-router'
 import { getRepository } from 'typeorm'
 import { MAX_AGE } from '../constants/max-age'
@@ -11,12 +10,6 @@ import { User } from '../entities'
 const debug = require('debug')('things-factory:auth-base:auth-public-process-router')
 
 export const authPublicProcessRouter = new Router()
-
-const bodyParserOption = {
-  formLimit: '10mb',
-  jsonLimit: '10mb',
-  textLimit: '10mb'
-}
 
 // static pages
 authPublicProcessRouter.get('/signup', async (context, next) => {
@@ -92,7 +85,7 @@ authPublicProcessRouter.get('/result', async (context, next) => {
 })
 
 // for authentication
-authPublicProcessRouter.post('/signup', koaBodyParser(bodyParserOption), async (context, next) => {
+authPublicProcessRouter.post('/signup', async (context, next) => {
   try {
     let user = context.request.body
     let { token } = await signup(
@@ -130,7 +123,7 @@ authPublicProcessRouter.post('/signup', koaBodyParser(bodyParserOption), async (
   }
 })
 
-authPublicProcessRouter.post('/signout', koaBodyParser(bodyParserOption), async (context, next) => {
+authPublicProcessRouter.post('/signout', async (context, next) => {
   try {
     context.body = {
       message: 'signout successfully'
@@ -166,7 +159,7 @@ authPublicProcessRouter.get('/verify/:token', async (context, next) => {
   }
 })
 
-authPublicProcessRouter.post('/resend-verification-email', koaBodyParser(bodyParserOption), async (context, next) => {
+authPublicProcessRouter.post('/resend-verification-email', async (context, next) => {
   const { email } = context.request.body
   try {
     var succeed = await resendVerificationEmail(email, context)
@@ -181,7 +174,7 @@ authPublicProcessRouter.post('/resend-verification-email', koaBodyParser(bodyPar
   }
 })
 
-authPublicProcessRouter.post('/forgot-password', koaBodyParser(bodyParserOption), async (context, next) => {
+authPublicProcessRouter.post('/forgot-password', async (context, next) => {
   try {
     var { email } = context.request.body
     if (!email) return next()
@@ -207,7 +200,7 @@ authPublicProcessRouter.post('/forgot-password', koaBodyParser(bodyParserOption)
   }
 })
 
-authPublicProcessRouter.post('/reset-password', koaBodyParser(bodyParserOption), async (context, next) => {
+authPublicProcessRouter.post('/reset-password', async (context, next) => {
   try {
     const { password, token } = context.request.body
     if (!(token && password)) {
@@ -265,7 +258,7 @@ authPublicProcessRouter.post('/reset-password', koaBodyParser(bodyParserOption),
   }
 })
 
-authPublicProcessRouter.post('/unlock-account', koaBodyParser(bodyParserOption), async (context, next) => {
+authPublicProcessRouter.post('/unlock-account', async (context, next) => {
   try {
     var { password, token } = context.request.body
 
