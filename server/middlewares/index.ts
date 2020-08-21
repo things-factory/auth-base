@@ -21,7 +21,6 @@ var graphqlAuthMiddleware = async (context, next) => {
 
 const AUTH_CHECK_URLS = ['graphql']
 
-/* TODO authcheck 화이트리스트를 모듈에서 추가할 수 있는 방법을 제시해야 한다. */
 process.on('bootstrap-module-middleware' as any, app => {
   let unlessOption = {
     path: [new RegExp(`^(?!\/?(${AUTH_CHECK_URLS.join('|')})(?![^/]))`)]
