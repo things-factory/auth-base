@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-base",
-  "version": "2.6.0-beta.4",
+  "version": "2.5.0-beta.6",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -23,7 +23,7 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
-    "@things-factory/email-base": "^2.0.0",
+    "@things-factory/email-base": "^3.0.0-beta.1",
     "@things-factory/shell": "^2.3.0-beta.10",
     "jsonwebtoken": "^8.5.1",
     "koa-passport": "^4.1.3",
