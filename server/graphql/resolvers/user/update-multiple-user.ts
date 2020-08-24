@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { getConnection, getManager } from 'typeorm'
 import { User } from '../../../entities'
 
 export const updateMultipleUser = {
@@ -62,29 +62,35 @@ export const updateMultipleUser = {
           })
 
           if (newRecord.status) {
-            try {
-              await txManager
-                .createQueryBuilder()
-                .insert()
-                .into('users_domains')
-                .values({
-                  usersId: user.id,
-                  domainsId: (await user.domain).id
+            await getManager().transaction(async () => {
+              try {
+                await getManager().transaction(async insertTxMgr => {
+                  await insertTxMgr
+                    .createQueryBuilder()
+                    .insert()
+                    .into('users_domains')
+                    .values({
+                      usersId: user.id,
+                      domainsId: (await user.domain).id
+                    })
+                    .execute()
                 })
-                .execute()
-            } catch (e) {
-              // repository api는 작동하지 않음.
-              await txManager
-                .createQueryBuilder()
-                .update('users_domains')
-                .set({
-                  domainsId: newRecord.domain.id
+              } catch (e) {
+                await getManager().transaction(async updateTxMgr => {
+                  // repository api는 작동하지 않음.
+                  await updateTxMgr
+                    .createQueryBuilder()
+                    .update('users_domains')
+                    .set({
+                      domainsId: newRecord.domain.id
+                    })
+                    .where({
+                      usersId: user.id
+                    })
+                    .execute()
                 })
-                .where({
-                  usersId: user.id
-                })
-                .execute()
-            }
+              }
+            })
           }
 
           results.push({ ...result, cuFlag: 'M' })
